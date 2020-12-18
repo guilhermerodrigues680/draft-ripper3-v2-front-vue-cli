@@ -1,6 +1,19 @@
 <template>
   <v-container>
-    <h1 class="text-center">Viagens classificadas</h1>
+    <h1 class="text-center">DEBUG - Viagens classificadas</h1>
+
+    <v-select
+      v-model="selecaoDiaProcessado"
+      :items="datasProcessadas"
+      label="Datas Processadas"
+    ></v-select>
+
+    <v-btn
+      @click="buscarDataProcessamento"
+    >Buscar processamento</v-btn>
+    <v-btn
+      @click="atualizarDatasProcessadas"
+    >Atualizar datas processadas</v-btn>
 
     <v-col>
       <v-text-field
@@ -25,7 +38,7 @@
 import ViagensClassificadasTable from '@/components/ViagensClassificadasTable.vue'
 import RastreioUsuario from '@/components/RastreioUsuario.vue'
 
-import { getViagensClassificadas } from "../services/api-services"
+import { /*getViagensClassificadas*/getDiaProcessado, getDiasProcessados } from "../services/api-services"
 import _ from 'lodash';
 
 export default {
@@ -39,17 +52,28 @@ export default {
   data: () => ({
     viagensClassificadas: [],
     search: '',
-    pernasRastreio: []
+    pernasRastreio: [],
+    datasProcessadas: [],
+    selecaoDiaProcessado: ''
   }),
 
   mounted: async function () {
+
     try {
-      const apiRes = await getViagensClassificadas(new Date(2020, 10, 23))
-      this.viagensClassificadas = apiRes.viagensClassificadasEReceitas //.slice(0, 10)
-      console.info('Viagens carregadas')
+      const apiRes = await getDiasProcessados()
+      this.datasProcessadas = apiRes.sort()
+      console.info('Arquivos processados')
     } catch (error) {
-      console.error('Não foi possivel carregar as viagens classificadas')
+      console.error('Não foi possivel carregar os arquivos processados')
     }
+
+    // try {
+    //   const apiRes = await getViagensClassificadas(new Date(2020, 10, 23))
+    //   this.viagensClassificadas = apiRes.viagensClassificadasEReceitas //.slice(0, 10)
+    //   console.info('Viagens carregadas')
+    // } catch (error) {
+    //   console.error('Não foi possivel carregar as viagens classificadas')
+    // }
   },
 
   methods: {
@@ -58,6 +82,24 @@ export default {
     }, 2000),
     usuidClick (pernas) {
       this.pernasRastreio = pernas;
+    },
+    buscarDataProcessamento: async function () {
+      try {
+        const apiRes = await getDiaProcessado(new Date(this.selecaoDiaProcessado))
+        this.viagensClassificadas = apiRes.viagensClassificadasEReceitas
+        console.info('Viagens carregadas')
+      } catch (error) {
+        console.error('Não foi possivel carregar as viagens classificadas')
+      }
+    },
+    atualizarDatasProcessadas: async function () {
+      try {
+        const apiRes = await getDiasProcessados()
+        this.datasProcessadas = apiRes.sort()
+        console.info('Arquivos processados')
+      } catch (error) {
+        console.error('Não foi possivel carregar os arquivos processados')
+      }
     }
   }
 
