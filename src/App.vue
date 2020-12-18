@@ -20,6 +20,13 @@
           About
         </v-btn>
 
+        <v-btn
+          to="/cadastrar-classificacao-viagem"
+          text
+        >
+          Cadastrar classificacao de viagem
+        </v-btn>
+
       </div>
 
       <v-spacer></v-spacer>

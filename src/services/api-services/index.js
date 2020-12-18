@@ -16,4 +16,18 @@ async function getViagensClassificadas(dataReferencia) {
   return [];
 }
 
-export { getViagensClassificadas }
+/**
+ */
+async function getTiposLinhas() {
+  try {
+    const res = await apiInstance.get('/classificacao/tipos-linhas')
+    return res.data
+  } catch (error) {
+    console.error('Ocorreu um erro')
+    console.error(error)
+  }
+
+  return [];
+}
+
+export { getViagensClassificadas, getTiposLinhas }
