@@ -19,6 +19,11 @@ const routes = [
     component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
   },
   {
+    path: '/cadastro-classificacao-linha',
+    name: 'CadastroClassificaoLinha',
+    component: () => import('../views/CadastroClassificaoLinha.vue')
+  },
+  {
     path: '*',
     name: '404',
     component: () => import('../views/404.vue')

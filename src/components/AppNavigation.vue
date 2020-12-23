@@ -35,6 +35,7 @@ export default {
   data: () => ({
     links: [
       { icon: "mdi-home", title: "Páginal Inicial", to: "/" },
+      { icon: "mdi-vector-polyline-plus", title: "Cadastro Classificação Linha", to: "/cadastro-classificacao-linha" },
       { icon: "mdi-view-dashboard", title: "Foo", to: "/foo" },
       { icon: "mdi-plus", title: "Bar", to: "/bar" },
       { icon: "mdi-forum", title: "About", to: "/about" }
