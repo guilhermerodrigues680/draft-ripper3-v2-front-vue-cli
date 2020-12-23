@@ -70,7 +70,7 @@
                 <v-col cols="12" md="6">
                   <v-select
                     v-model="cadastroClassificaoLinha.tipoLinha"
-                    label="Tipo para essa linha"
+                    :label="tiposLinha.length === 0 ? 'Tipo para essa linha. OBS: Cadastre um tipo primeiro' : 'Tipo para essa linha'"
                     :items="tiposLinha"
                     :menu-props="{ auto: true }"
                   ></v-select>
@@ -191,12 +191,17 @@ export default {
   methods: {
     cadastrarTipoLinha() {
       this.tiposLinha.push(this.cadastroTipoLinha.nome);
+      this.cadastroTipoLinha.nome = null
+      this.cadastroTipoLinha.descricao = null
     },
     changeCheckDtValIndefinida(value) {
       value && (this.cadastroClassificaoLinha.dataValidade = null)
     },
     cadastrarClassificacao: async function() {
-
+      const rawJSON = JSON.stringify(this.cadastroClassificaoLinha, '', 2)
+      const blob = new Blob([rawJSON], {type : 'application/json'})
+      const url  = URL.createObjectURL(blob);
+      window.open(url);
     }
   },
 }
