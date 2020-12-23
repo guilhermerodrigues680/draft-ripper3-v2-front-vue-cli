@@ -24,6 +24,11 @@ const routes = [
     component: () => import('../views/CadastroClassificaoLinha.vue')
   },
   {
+    path: '/cadastro-classificacao-pernas',
+    name: 'CadastrarClassificacaoPernas',
+    component: () => import('../views/CadastrarClassificacaoPernas.vue')
+  },
+  {
     path: '*',
     name: '404',
     component: () => import('../views/404.vue')
