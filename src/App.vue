@@ -40,6 +40,7 @@ import AppNavigation from './components/AppNavigation.vue';
 
 export default {
   name: 'App',
+  title: 'Debug',
 
   components: {
     AppNavigation,
