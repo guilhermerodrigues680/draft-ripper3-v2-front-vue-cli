@@ -1,8 +1,8 @@
-name: Deploy Vue App - Master Branch
+name: Deploy Vue App - GitHub-Pages Branch
 
 on:
   push:
-    branches: [ develop ]
+    branches: [ master ]
 
 jobs:
   build:
@@ -10,10 +10,10 @@ jobs:
     runs-on: ubuntu-18.04
 
     steps:
-    - name: Checkout branch develop
+    - name: Checkout branch master
       uses: actions/checkout@v2
       with:
-        ref: develop
+        ref: master
 
     - name: Use Node.js v14.15.1
       uses: actions/setup-node@v2
@@ -34,15 +34,15 @@ jobs:
         path: dist/
 
   deploy_prod:
-    name: Deploy App - Master Branch
+    name: Deploy App - GitHub-Pages Branch
     needs: [ build ]
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout branch master
+    - name: Checkout branch GitHub-Pages
       uses: actions/checkout@v2
       with:
-        ref: master
+        ref: GitHub-Pages
 
     - name: Set global git username/email
       run: |
@@ -55,4 +55,4 @@ jobs:
         path: ./
 
     - run: git add --all && git commit -m "Deploy $(TZ=":America/Sao_Paulo" date +"%d-%m-%Y %T")"
-    - run: git push origin master
+    - run: git push origin GitHub-Pages
