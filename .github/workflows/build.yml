@@ -24,7 +24,7 @@ jobs:
       run: |
         npm install
 
-    - name: npm install
+    - name: npm run build
       run: |
         npm run build
 
@@ -36,13 +36,26 @@ jobs:
   deploy_prod:
     name: Deploy App - GitHub-Pages Branch
     needs: [ build ]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
 
     steps:
     - name: Checkout branch GitHub-Pages
       uses: actions/checkout@v2
       with:
         ref: GitHub-Pages
+
+    - name: Apagar arquivos do deploy anterior
+      run: |
+        find . \
+          ! -name "." \
+          ! -name ".." \
+          ! -name "README.md" \
+          ! -name ".gitignore" \
+          ! -name ".git" \
+          ! -name "node_modules" \
+          ! -path "./.git/*" \
+          ! -path "./node_modules/*" \
+          -exec rm -rf {} +
 
     - name: Set global git username/email
       run: |
