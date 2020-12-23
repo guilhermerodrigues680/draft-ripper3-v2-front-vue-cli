@@ -1,0 +1,58 @@
+name: Deploy Vue App - Master Branch
+
+on:
+  push:
+    branches: [ develop ]
+
+jobs:
+  build:
+    name: Vue App Build
+    runs-on: ubuntu-18.04
+
+    steps:
+    - name: Checkout branch develop
+      uses: actions/checkout@v2
+      with:
+        ref: develop
+
+    - name: Use Node.js v14.15.1
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14.15.1'
+
+    - name: npm install
+      run: |
+        npm install
+
+    - name: npm install
+      run: |
+        npm run build
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: dist
+        path: dist/
+
+  deploy_prod:
+    name: Deploy App - Master Branch
+    needs: [ build ]
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout branch master
+      uses: actions/checkout@v2
+      with:
+        ref: master
+
+    - name: Set global git username/email
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+
+    - uses: actions/download-artifact@v2
+      with:
+        name: dist
+        path: ./
+
+    - run: git add --all && git commit -m "Deploy $(TZ=":America/Sao_Paulo" date +"%d-%m-%Y %T")"
+    - run: git push origin master
