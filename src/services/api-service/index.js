@@ -1,11 +1,20 @@
-//import apiInstance from "./apiInstance"
-import linha from "./mock-api/classificacao/linhas.json";
+import apiInstance from "./apiInstance"
 
 async function getTodasLinhas() {
   try {
-    //const res = await apiInstance.get('/classificacao/linhas')
-    //return res.data
-    return linha.linhas;
+    const res = await apiInstance.get('/tipo-classificacao-linha/linhas')
+    return res.data
+  } catch (error) {
+    console.error('Ocorreu um erro')
+    console.error(error)
+    throw error
+  }
+}
+
+async function getTiposLinha() {
+  try {
+    const res = await apiInstance.get("/tipo-classificacao-linha/tipos-linhas")
+    return res.data
   } catch (error) {
     console.error('Ocorreu um erro')
     console.error(error)
@@ -15,4 +24,5 @@ async function getTodasLinhas() {
 
 export default {
   getTodasLinhas,
+  getTiposLinha
 }
