@@ -96,6 +96,58 @@
       </v-row>
 
       <v-row>
+        <v-col cols="12" md="6">
+          <v-checkbox
+            v-model="temExcecao"
+            color="secondary"
+            label="Tem Exceção?"
+          >
+          </v-checkbox>
+        </v-col>
+      </v-row>
+
+      <v-row v-if="temExcecao">
+        <v-col cols="12" md="6">
+          <v-autocomplete
+            v-model="linhaExcecao"
+            :items="todasLinhas"
+            item-text="text"
+            item-value="linId"
+            label="Linha para adicionar exceção"
+          ></v-autocomplete>
+        </v-col>
+
+        <v-col cols="6" v-if="linhaExcecao !== null">
+          <!-- DIALOG REGRA DISTRIBUICAO -->
+          <v-dialog v-model="dialog">
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn
+                color="primary"
+                v-bind="attrs"
+                v-on="on"
+              >Adicionar Exceção</v-btn>
+            </template>
+
+            <v-card>
+              <v-card-title class="headline grey lighten-2">
+                Exceção
+              </v-card-title>
+
+              <v-card-text>
+                <RegraDistribuicao :pernas="cadastroRegra.pernas" @adicionarExcecao="adicionarExcessao"/>
+              </v-card-text>
+            </v-card>
+          </v-dialog>
+        </v-col>
+      </v-row>
+
+      <v-row>
+        <v-col cols="12" v-if="Object.keys(cadastroRegra.excecoes).length > 0">
+          <p>Linhas com exceção: </p> {{ Object.keys(cadastroRegra.excecoes) }}
+        </v-col>
+      </v-row>
+
+      <v-row>
         <v-col cols="12" md="3" v-if="cadastroRegra.pernas.length > 0">
           <v-btn
             @click="cadastrarRegra"
@@ -121,10 +173,16 @@
 </template>
 
 <script>
+import RegraDistribuicao from "../components/RegraDistribuicao.vue";
+
 import apiService from "../services/api-service";
 
 export default {
   name: 'CadastrarClassificacaoPernas',
+
+  components: {
+    RegraDistribuicao
+  },
 
   data: () => ({
     tiposLinhasPerna: [],
@@ -133,8 +191,13 @@ export default {
       descricao: '',
       pernas: [],
       pernaOperadora: null,
-      pernasComReceita: []
-    }
+      pernasComReceita: [],
+      excecoes: {}
+    },
+    todasLinhas: [],
+    temExcecao: false,
+    linhaExcecao: null,
+    dialog: false
   }),
 
   computed: {
@@ -145,14 +208,21 @@ export default {
 
   created: async function () {
     try {
-      // const apiRes = await apiService.getTodasLinhas();
-      // this.tiposLinhas = apiRes.linhas.map(lin => ({ linId: lin.linId, text: `${lin.codificacao} - ${lin.descricao}` }))
       const apiRes = await apiService.getTiposLinha();
       this.tiposLinhas = apiRes.tiposDeLinha.map(t => ({ id: t.id, nome: t.nome }))
       console.log(apiRes)
       console.info('Tipos linhas carregadas')
     } catch (error) {
       console.error('Não foi possivel carregar os Tipos de linhas')
+    }
+
+    try {
+      const apiRes = await apiService.getTodasLinhas();
+      this.todasLinhas = apiRes.linhas.map(lin => ({ linId: lin.linId, text: `${lin.codificacao} - ${lin.descricao}` }))
+      console.log(apiRes)
+      console.info('linhas carregadas')
+    } catch (error) {
+      console.error('Não foi possivel carregar os linhas')
     }
   },
 
@@ -185,11 +255,17 @@ export default {
       regra.pernaClassificacaoList = this.cadastroRegra.pernas.map(p => ({ tiposDeLinha: p.map(p1 => ({ id: p1 })) }))
       regra.regraDistribuicao.idxPernaOperadora = this.cadastroRegra.pernaOperadora
       regra.regraDistribuicao.idxsPernaComReceita = this.cadastroRegra.pernasComReceita
+      regra.regraDistribuicao.idsLinhasComExcecoes = this.cadastroRegra.excecoes
 
       const rawJSON = JSON.stringify(regra, '', 2)
       const blob = new Blob([rawJSON], {type : 'application/json'})
       const url  = URL.createObjectURL(blob)
       window.open(url)
+    },
+    adicionarExcessao(regraDistribuicao) {
+      this.cadastroRegra.excecoes[this.linhaExcecao] = regraDistribuicao
+      this.dialog = false
+      this.linhaExcecao = null
     }
   }
 
