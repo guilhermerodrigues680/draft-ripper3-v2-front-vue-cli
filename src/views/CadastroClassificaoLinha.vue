@@ -57,14 +57,14 @@
             <v-container class="ma-0 pa-0">
               <v-row>
                 <v-col cols="12" md="6">
-                  <v-select
+                  <v-autocomplete
                     v-model="cadastroClassificaoLinha.linha"
                     label="Linha"
                     item-text="text"
                     item-value="linId"
+                    clearable
                     :items="todasLinhas"
-                    :menu-props="{ auto: true }"
-                  ></v-select>
+                  ></v-autocomplete>
                 </v-col>
 
                 <v-col cols="12" md="6">
@@ -72,6 +72,8 @@
                     v-model="cadastroClassificaoLinha.tipoLinha"
                     :label="tiposLinha.length === 0 ? 'Tipo para essa linha. OBS: Cadastre um tipo primeiro' : 'Tipo para essa linha'"
                     :items="tiposLinha"
+                    item-text="nome"
+                    item-value="id"
                     :menu-props="{ auto: true }"
                   ></v-select>
                 </v-col>
@@ -120,18 +122,18 @@
                 </v-col>
 
                 <v-col cols="12" md="9" v-if="cadastroClassificaoLinha.eTerminal" class="pt-0 pb-0">
-                  <v-select
+                  <v-autocomplete
                     v-model="cadastroClassificaoLinha.alimentadoras"
                     :items="todasLinhas"
-                    :menu-props="{ auto: true }"
                     label="Linhas Alimentadoras"
                     item-text="text"
                     item-value="linId"
                     multiple
                     chips
+                    deletable-chips
                     hide-details
                     prepend-icon="mdi-bus-multiple"
-                  ></v-select>
+                  ></v-autocomplete>
                 </v-col>
               </v-row>
 
@@ -183,9 +185,23 @@ export default {
   }),
 
   created: async function() {
-    const linhas = await apiService.getTodasLinhas();
-    const linDesc = linhas.map(lin => ({ linId: lin.linId, text: `${lin.codificacao} - ${lin.descricao}` }))
-    this.todasLinhas = linDesc
+    try {
+      const apiRes = await apiService.getTiposLinha();
+      this.tiposLinha = apiRes.tiposDeLinha.map(t => ({ id: t.id, nome: t.nome }))
+      console.log(apiRes)
+      console.info('Tipos linhas carregadas')
+    } catch (error) {
+      console.error('Não foi possivel carregar os Tipos de linhas')
+    }
+
+    try {
+      const apiRes = await apiService.getTodasLinhas();
+      this.todasLinhas = apiRes.linhas.map(lin => ({ linId: lin.linId, text: `${lin.codificacao} - ${lin.descricao}` }))
+      console.log(apiRes)
+      console.info('linhas carregadas')
+    } catch (error) {
+      console.error('Não foi possivel carregar os linhas')
+    }
   },
 
   methods: {
