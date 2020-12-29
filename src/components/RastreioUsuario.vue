@@ -1,7 +1,7 @@
 <template>
   <v-row v-if="pernas.length > 0">
     <v-col>
-      <h1 class="text-center">Rastreio do usuário selecionado</h1>
+      <h1 class="text-center text-h4 font-weight-light">Rastreio do usuário selecionado</h1>
 
       <v-data-table
         dense
