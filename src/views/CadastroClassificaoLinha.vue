@@ -48,6 +48,8 @@
       </v-row>
       <!-- FIM - Criar tipo linha -->
 
+      <v-divider></v-divider>
+
       <!-- Classificar Linha -->
       <v-row>
         <v-col cols="12">
@@ -192,6 +194,7 @@ export default {
       console.info('Tipos linhas carregadas')
     } catch (error) {
       console.error('Não foi possivel carregar os Tipos de linhas')
+      this.showToast('Não foi possivel carregar os Tipos de linhas.', 'Erro', 'error')
     }
 
     try {
@@ -201,23 +204,84 @@ export default {
       console.info('linhas carregadas')
     } catch (error) {
       console.error('Não foi possivel carregar os linhas')
+      this.showToast('Não foi possivel carregar as linhas.', 'Erro', 'error')
     }
   },
 
   methods: {
-    cadastrarTipoLinha() {
-      this.tiposLinha.push(this.cadastroTipoLinha.nome);
-      this.cadastroTipoLinha.nome = null
-      this.cadastroTipoLinha.descricao = null
+    cadastrarTipoLinha: async function () {
+      const contratoTipoLinha = {
+        nome: '',
+        descricao: ''
+      }
+
+      contratoTipoLinha.nome = this.cadastroTipoLinha.nome
+      contratoTipoLinha.descricao = this.cadastroTipoLinha.descricao
+
+      // Cadastrar tipo de linha
+      try {
+        const apiRes = await apiService.postCadastrarTipoLinha(contratoTipoLinha);
+        console.log(apiRes)
+        this.showToast('Tipo de linha cadastrado!')
+        this.cadastroTipoLinha.nome = null
+        this.cadastroTipoLinha.descricao = null
+      } catch (error) {
+        console.error('Ocorreu um erro ao cadastrar o tipo da linha')
+      }
+
+      // Recuperar novos tipos de linha
+      try {
+        const apiRes = await apiService.getTiposLinha();
+        this.tiposLinha = apiRes.tiposDeLinha.map(t => ({ id: t.id, nome: t.nome }))
+        console.log(apiRes)
+        console.info('Tipos linhas carregadas')
+      } catch (error) {
+        console.error('Não foi possivel carregar os Tipos de linhas')
+      }
+
     },
     changeCheckDtValIndefinida(value) {
       value && (this.cadastroClassificaoLinha.dataValidade = null)
     },
     cadastrarClassificacao: async function() {
-      const rawJSON = JSON.stringify(this.cadastroClassificaoLinha, '', 2)
-      const blob = new Blob([rawJSON], {type : 'application/json'})
-      const url  = URL.createObjectURL(blob);
-      window.open(url);
+      const contratoClassificacaoLinha = {
+        linId: null,
+        tipoLinhaId: null,
+        nome: '',
+        dataVigencia: '',
+        dataValidade: null,
+        alimentadoras: [],
+        eterminal: false
+      }
+
+      contratoClassificacaoLinha.linId = this.cadastroClassificaoLinha.linha
+      contratoClassificacaoLinha.tipoLinhaId = this.cadastroClassificaoLinha.tipoLinha
+      contratoClassificacaoLinha.nome = this.cadastroClassificaoLinha.nomeClassificacao
+      contratoClassificacaoLinha.dataVigencia = this.cadastroClassificaoLinha.dataVigencia
+      contratoClassificacaoLinha.dataValidade = this.cadastroClassificaoLinha.dataValidade
+      contratoClassificacaoLinha.alimentadoras = this.cadastroClassificaoLinha.alimentadoras
+      contratoClassificacaoLinha.eterminal = this.cadastroClassificaoLinha.eTerminal
+
+      // Cadastrar classificaco de linha
+      try {
+        const apiRes = await apiService.postCadastrarClassificacoLinha(contratoClassificacaoLinha);
+        console.log(apiRes)
+        this.showToast('Classificação de linha cadastrada!')
+      } catch (error) {
+        console.error('Ocorreu um erro ao cadastrar a classificacao da linha')
+      }
+
+    },
+    showToast: function (message, title = 'Sucesso', icon = 'success') {
+      this.$swal({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000,
+        icon: icon,
+        title: title,
+        text: message,
+      });
     }
   },
 }

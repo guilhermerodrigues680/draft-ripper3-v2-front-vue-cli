@@ -238,8 +238,8 @@ export default {
       this.cadastroRegra.pernasComReceita.splice(0, this.cadastroRegra.pernasComReceita.length)
       this.cadastroRegra.pernas.splice(0, this.cadastroRegra.pernas.length);
     },
-    cadastrarRegra() {
-      const regra = {
+    cadastrarRegra: async function () {
+      const contratoCadastroRegra = {
         descricao: '',
         pernaClassificacaoList: [],
         regraDistribuicao: {
@@ -250,22 +250,42 @@ export default {
         }
       }
 
-      regra.descricao = this.cadastroRegra.descricao
+      contratoCadastroRegra.descricao = this.cadastroRegra.descricao
 
-      regra.pernaClassificacaoList = this.cadastroRegra.pernas.map(p => ({ tiposDeLinha: p.map(p1 => ({ id: p1 })) }))
-      regra.regraDistribuicao.idxPernaOperadora = this.cadastroRegra.pernaOperadora
-      regra.regraDistribuicao.idxsPernaComReceita = this.cadastroRegra.pernasComReceita
-      regra.regraDistribuicao.idsLinhasComExcecoes = this.cadastroRegra.excecoes
+      contratoCadastroRegra.pernaClassificacaoList = this.cadastroRegra.pernas.map(p => ({ tiposDeLinha: p.map(p1 => ({ id: p1 })) }))
+      contratoCadastroRegra.regraDistribuicao.idxPernaOperadora = this.cadastroRegra.pernaOperadora
+      contratoCadastroRegra.regraDistribuicao.idxsPernaComReceita = this.cadastroRegra.pernasComReceita
+      contratoCadastroRegra.regraDistribuicao.idsLinhasComExcecoes = Object.keys(this.cadastroRegra.excecoes).length !== 0 ? this.cadastroRegra.excecoes : null
 
-      const rawJSON = JSON.stringify(regra, '', 2)
-      const blob = new Blob([rawJSON], {type : 'application/json'})
-      const url  = URL.createObjectURL(blob)
-      window.open(url)
+      // Cadastrar classificaco de linha
+      try {
+        const apiRes = await apiService.postCadastrarRegra(contratoCadastroRegra);
+        console.log(apiRes)
+        this.showToast('Regra cadastrada!')
+      } catch (error) {
+        console.error('Ocorreu um erro ao cadastrar a regra')
+      }
+
+      // const rawJSON = JSON.stringify(contratoCadastroRegra, '', 2)
+      // const blob = new Blob([rawJSON], {type : 'application/json'})
+      // const url  = URL.createObjectURL(blob)
+      // window.open(url)
     },
     adicionarExcessao(regraDistribuicao) {
       this.cadastroRegra.excecoes[this.linhaExcecao] = regraDistribuicao
       this.dialog = false
       this.linhaExcecao = null
+    },
+    showToast: function (message, title = 'Sucesso', icon = 'success') {
+      this.$swal({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000,
+        icon: icon,
+        title: title,
+        text: message,
+      });
     }
   }
 
