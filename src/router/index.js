@@ -29,6 +29,11 @@ const routes = [
     component: () => import('../views/CadastrarClassificacaoPernas.vue')
   },
   {
+    path: '/viagens-classificadas',
+    name: 'ViagensClassificadas',
+    component: () => import('../views/ViagensClassificadas.vue')
+  },
+  {
     path: '*',
     name: '404',
     component: () => import('../views/404.vue')

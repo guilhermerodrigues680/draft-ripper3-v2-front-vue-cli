@@ -37,6 +37,7 @@ export default {
       { icon: "mdi-home", title: "Páginal Inicial", to: "/" },
       { icon: "mdi-vector-polyline-plus", title: "Cadastro Classificação Linha", to: "/cadastro-classificacao-linha" },
       { icon: "mdi-table-column-plus-after", title: "Cadastro Classificação Pernas", to: "/cadastro-classificacao-pernas" },
+      { icon: "mdi-view-sequential-outline", title: "Viagens Classificadas", to: "/viagens-classificadas" },
       { icon: "mdi-view-dashboard", title: "Foo", to: "/foo" },
       { icon: "mdi-plus", title: "Bar", to: "/bar" },
       { icon: "mdi-forum", title: "About", to: "/about" }
