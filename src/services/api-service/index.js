@@ -82,6 +82,30 @@ async function getDiaProcessado(dataReferencia) {
   return [];
 }
 
+async function getIniciarProcessamento() {
+  try {
+    const res = await apiInstance.get('/processamento/iniciar')
+    return res.data
+  } catch (error) {
+    console.error('Ocorreu um erro')
+    console.error(error)
+  }
+
+  return [];
+}
+
+async function getPararProcessamento() {
+  try {
+    const res = await apiInstance.get('/processamento/parar')
+    return res.data
+  } catch (error) {
+    console.error('Ocorreu um erro')
+    console.error(error)
+  }
+
+  return [];
+}
+
 export default {
   getTodasLinhas,
   getTiposLinha,
@@ -89,5 +113,7 @@ export default {
   postCadastrarClassificacoLinha,
   postCadastrarRegra,
   getDiasProcessados,
-  getDiaProcessado
+  getDiaProcessado,
+  getIniciarProcessamento,
+  getPararProcessamento
 }

@@ -34,6 +34,11 @@ const routes = [
     component: () => import('../views/ViagensClassificadas.vue')
   },
   {
+    path: '/processamento-config',
+    name: 'ProcessamentoConfig',
+    component: () => import('../views/ProcessamentoConfig.vue')
+  },
+  {
     path: '*',
     name: '404',
     component: () => import('../views/404.vue')
