@@ -43,7 +43,7 @@ export default {
   methods: {
     iniciarProcessamento: async function() {
       try {
-        await apiService.getIniciarProcessamento()
+        await apiService.postIniciarProcessamento()
         this.showToast('Processamento iniciado!')
       } catch (error) {
         console.log(error)
@@ -52,7 +52,7 @@ export default {
     },
     pararProcessamento: async function() {
       try {
-        await apiService.getPararProcessamento()
+        await apiService.postPararProcessamento()
         this.showToast('Processamento parado!', 'Info', 'info')
       } catch (error) {
         console.log(error)

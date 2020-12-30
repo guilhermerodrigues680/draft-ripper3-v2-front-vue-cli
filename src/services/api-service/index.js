@@ -2,7 +2,7 @@ import apiInstance from "./apiInstance"
 
 async function getTodasLinhas() {
   try {
-    const res = await apiInstance.get('/tipo-classificacao-linha/linhas')
+    const res = await apiInstance.get('/linhas')
     return res.data
   } catch (error) {
     console.error('Ocorreu um erro')
@@ -13,7 +13,7 @@ async function getTodasLinhas() {
 
 async function getTiposLinha() {
   try {
-    const res = await apiInstance.get("/tipo-classificacao-linha/tipos-linhas")
+    const res = await apiInstance.get("/classificacao/tipos-de-linha")
     return res.data
   } catch (error) {
     console.error('Ocorreu um erro')
@@ -24,7 +24,7 @@ async function getTiposLinha() {
 
 async function postCadastrarTipoLinha(contratoCadastroTipoLinha) {
   try {
-    const res = await apiInstance.post("/tipo-classificacao-linha/tipos-linhas", contratoCadastroTipoLinha)
+    const res = await apiInstance.post("/classificacao/tipos-de-linha", contratoCadastroTipoLinha)
     return res.data
   } catch (error) {
     console.error('Ocorreu um erro')
@@ -35,7 +35,7 @@ async function postCadastrarTipoLinha(contratoCadastroTipoLinha) {
 
 async function postCadastrarClassificacoLinha(contratoCadastroClassificacaoLinha) {
   try {
-    const res = await apiInstance.post("/tipo-classificacao-linha/classificacao-linhas", contratoCadastroClassificacaoLinha)
+    const res = await apiInstance.post("/classificacao/classificacao-de-linhas", contratoCadastroClassificacaoLinha)
     return res.data
   } catch (error) {
     console.error('Ocorreu um erro')
@@ -82,9 +82,9 @@ async function getDiaProcessado(dataReferencia) {
   return [];
 }
 
-async function getIniciarProcessamento() {
+async function postIniciarProcessamento() {
   try {
-    const res = await apiInstance.get('/processamento/iniciar')
+    const res = await apiInstance.post('/processamento/iniciar')
     return res.data
   } catch (error) {
     console.error('Ocorreu um erro')
@@ -94,9 +94,9 @@ async function getIniciarProcessamento() {
   return [];
 }
 
-async function getPararProcessamento() {
+async function postPararProcessamento() {
   try {
-    const res = await apiInstance.get('/processamento/parar')
+    const res = await apiInstance.post('/processamento/parar')
     return res.data
   } catch (error) {
     console.error('Ocorreu um erro')
@@ -114,6 +114,6 @@ export default {
   postCadastrarRegra,
   getDiasProcessados,
   getDiaProcessado,
-  getIniciarProcessamento,
-  getPararProcessamento
+  postIniciarProcessamento,
+  postPararProcessamento
 }
