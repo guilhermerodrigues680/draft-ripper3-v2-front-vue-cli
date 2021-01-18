@@ -8,9 +8,23 @@
         :items-per-page="5"
         :search="search"
         :custom-filter="filterOnlyEquals"
+        :footer-props="{
+          showFirstLastPage: true,
+          firstIcon: 'mdi-arrow-collapse-left',
+          lastIcon: 'mdi-arrow-collapse-right',
+          prevIcon: 'mdi-minus',
+          nextIcon: 'mdi-plus'
+        }"
         @click:row="rowClick"
         class="table-cursor elevation-1"
-      ></v-data-table>
+      >
+        <template v-slot:[`item.operadoraId`]="{ item }">
+          {{ Object.keys(item.receitaOperadora).join(",") }}
+        </template>
+        <template v-slot:[`item.receitaOperadora`]="{ item }">
+          {{ item.receitaOperadora }}
+        </template>
+      </v-data-table>
 
     </v-col>
   </v-row>
@@ -29,8 +43,8 @@ export default {
     headers: [
       { text: 'Usuário', value: 'usuId' },
       { text: 'Classificação da Viagem', value: 'viagemClassificacaoDescricao' },
-      { text: 'Operadora', value: 'operadoraId' },
-      { text: 'Receita Operadora', value: 'receitaOperadora' },
+      { text: 'Operadora(s)', value: 'operadoraId' },
+      { text: 'Receita Operadora(s)', value: 'receitaOperadora' },
     ]
   }),
 
@@ -40,6 +54,7 @@ export default {
         || (item.pernas.map(lp => lp.linIdUso.toFixed()).indexOf(search) !== -1)
         || (item.pernas.map(lp => lp.r95Id.toFixed()).indexOf(search) !== -1)
         || (item.pernas.map(lp => lp.linUso.toLowerCase()).indexOf(search.toLowerCase()) !== -1)
+        || (item.viagemClassificacaoDescricao.toLowerCase().includes(search.toLowerCase()))
     },
     rowClick (item /*, itemSlotData*/) {
       this.$emit('usuidClick', item.pernas)
