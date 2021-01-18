@@ -33,6 +33,17 @@ async function postCadastrarTipoLinha(contratoCadastroTipoLinha) {
   }
 }
 
+async function getListaClassificaoLinha() {
+  try {
+    const res = await apiInstance.get("/classificacao/classificacao-de-linhas")
+    return res.data
+  } catch(error) {
+    console.error('Ocorreu um erro')
+    console.error(error)
+    throw error
+  }
+}
+
 async function postCadastrarClassificacoLinha(contratoCadastroClassificacaoLinha) {
   try {
     const res = await apiInstance.post("/classificacao/classificacao-de-linhas", contratoCadastroClassificacaoLinha)
@@ -106,14 +117,55 @@ async function postPararProcessamento() {
   return [];
 }
 
+// ============== Operadoras e Financeiras ==============
+
+
+async function getOperadoraFinanceiraCllId(cllId) {
+  try {
+    const res = await apiInstance.get(`/classificacao/operadora-e-financeira/cll-id/${cllId}`)
+    return res.data
+  } catch (error) {
+    console.error('Ocorreu um erro')
+    console.error(error)
+    throw error
+  }
+}
+
+async function postOperadoraFinanceira(operadoraFinanceira) {
+  try {
+    const res = await apiInstance.post('/classificacao/operadora-e-financeira', operadoraFinanceira)
+    return res.data
+  } catch (error) {
+    console.error('Ocorreu um erro')
+    console.error(error)
+    
+    throw error
+  }
+}
+
+async function deleteOperadoraFinanceira(ofiId) {
+  try {
+    const res = await apiInstance.delete(`/classificacao/operadora-e-financeira/${ofiId}`)
+    return res.data
+  } catch (error) {
+    console.error('Ocorreu um erro')
+    console.error(error)
+    throw error;
+  }
+}
+
 export default {
   getTodasLinhas,
   getTiposLinha,
   postCadastrarTipoLinha,
+  getListaClassificaoLinha,
   postCadastrarClassificacoLinha,
   postCadastrarRegra,
   getDiasProcessados,
   getDiaProcessado,
   postIniciarProcessamento,
-  postPararProcessamento
+  postPararProcessamento,
+  getOperadoraFinanceiraCllId,
+  postOperadoraFinanceira,
+  deleteOperadoraFinanceira
 }

@@ -24,6 +24,11 @@ const routes = [
     component: () => import('../views/CadastroClassificaoLinha.vue')
   },
   {
+    path: '/operadoras-financeiras',
+    name: 'OperadorasFinanceiras',
+    component: () => import('../views/OperadorasFinanceiras.vue')
+  },
+  {
     path: '/cadastro-classificacao-pernas',
     name: 'CadastrarClassificacaoPernas',
     component: () => import('../views/CadastrarClassificacaoPernas.vue')

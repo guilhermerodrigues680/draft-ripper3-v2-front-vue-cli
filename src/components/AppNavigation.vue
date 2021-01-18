@@ -36,6 +36,7 @@ export default {
     links: [
       { icon: "mdi-home", title: "Páginal Inicial", to: "/" },
       { icon: "mdi-vector-polyline-plus", title: "Cadastro Classificação Linha", to: "/cadastro-classificacao-linha" },
+      { icon: "mdi-currency-usd-circle-outline", title: "Operadoras e Financeiras", to: "/operadoras-financeiras" },
       { icon: "mdi-table-column-plus-after", title: "Cadastro Classificação Pernas", to: "/cadastro-classificacao-pernas" },
       { icon: "mdi-view-sequential-outline", title: "Viagens Classificadas", to: "/viagens-classificadas" },
       { icon: "mdi-tools", title: "Processamento Conf.", to: "/processamento-config" },
