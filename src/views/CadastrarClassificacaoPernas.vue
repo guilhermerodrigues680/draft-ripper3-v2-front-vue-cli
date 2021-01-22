@@ -2,7 +2,7 @@
   <v-container fluid class="fill-height align-start">
     <v-container class="ma-0 pa-0">
       <v-row>
-        <v-col>
+        <v-col cols="12">
           <h1 class="text-h3 font-weight-light">
             Cadastrar Classificacao de Viagem
           </h1>
@@ -10,162 +10,170 @@
       </v-row>
 
       <v-row>
-        <v-col cols="12" md="6">
-          <v-text-field
-            v-model="cadastroRegra.descricao"
-            label="Descricao"
-          ></v-text-field>
-        </v-col>
-      </v-row>
+        <v-col cols="7">
+          <v-row>
+            <v-col cols="12">
+              <v-text-field
+                v-model="cadastroRegra.descricao"
+                label="Descricao"
+              ></v-text-field>
+            </v-col>
+          </v-row>
 
-      <v-row>
-        <v-col cols="12" md="8">
-          <v-autocomplete
-            v-model="tiposLinhasPerna"
-            :items="tiposLinhas"
-            item-text="nome"
-            item-value="id"
-            chips
-            label="Tipos de linha para a perna"
-            multiple
-          ></v-autocomplete>
-        </v-col>
+          <v-row>
+            <v-col cols="12">
+              <v-autocomplete
+                v-model="tiposLinhasPerna"
+                :items="tiposLinhas"
+                item-text="nome"
+                item-value="id"
+                chips
+                label="Tipos de linha para a perna"
+                multiple
+              ></v-autocomplete>
+            </v-col>
+          </v-row>
 
-        <v-col cols="12" md="4">
-          <v-btn
-            elevation="2"
-            block
-            large
-            color="primary"
-            @click="adicionarConjuntoPernas"
-          >Adicionar Conjunto de Pernas</v-btn>
-        </v-col>
-      </v-row>
-
-      <v-row v-if="cadastroRegra.pernas.length > 0">
-        <v-col cols="12" md="8">
-          <p>Sequência de ultilização</p>
-        </v-col>
-      </v-row>
-      <v-row v-if="cadastroRegra.pernas.length > 0">
-        <v-col cols="12" md="8">
-          <v-timeline dense>
-            <v-timeline-item v-for="(perna, idx) in cadastroRegra.pernas" :key="idx">
-              <v-card class="elevation-2">
-                <v-card-title class="body-1">
-                  {{ idx + 1 }}ª perna
-                  <span class="font-weight-medium">{{ idx === 0 ? '(Origem)' : idx === cadastroRegra.pernas.length-1 ? '(Destino)' : '' }}</span>
-                  - {{ tiposLinhas.filter(t => perna.includes(t.id)).map(t => t.nome) }}
-                  --- ids: {{ perna }}
-                </v-card-title>
-              </v-card>
-            </v-timeline-item>
-          </v-timeline>
-        </v-col>
-      </v-row>
-
-      <v-row v-if="cadastroRegra.pernas.length > 0">
-        <v-col cols="12" md="6">
-          <v-select
-            v-model="cadastroRegra.pernaOperadora"
-            :items="pernaIdxArr"
-            item-text="text"
-            item-value="idx"
-            label="Perna da operadora que recebe a receita"
-            thumb-color="orange"
-            thumb-label="always"
-          ></v-select>
-        </v-col>
-      </v-row>
-
-      <v-row v-if="cadastroRegra.pernas.length > 0">
-        <v-col cols="12" md="12">
-          <p>Pernas que entram no calculo da receita: </p>
-        </v-col>
-      </v-row>
-
-      <v-row>
-        <v-col cols="12" md="2" v-for="(perna, idx) in cadastroRegra.pernas" :key="idx">
-          <v-checkbox
-            v-model="cadastroRegra.pernasComReceita"
-            :label="`${idx + 1}ª Perna ${idx === 0 ? '(Origem)' : idx === cadastroRegra.pernas.length-1 ? '(Destino)' : ''}`"
-            :value="idx"
-            class="ma-0 pa-0"
-          ></v-checkbox>
-        </v-col>
-      </v-row>
-
-      <v-row>
-        <v-col cols="12" md="6">
-          <v-checkbox
-            v-model="temExcecao"
-            color="secondary"
-            label="Tem Exceção?"
-          >
-          </v-checkbox>
-        </v-col>
-      </v-row>
-
-      <v-row v-if="temExcecao">
-        <v-col cols="12" md="6">
-          <v-autocomplete
-            v-model="linhaExcecao"
-            :items="todasLinhas"
-            item-text="text"
-            item-value="linId"
-            label="Linha para adicionar exceção"
-          ></v-autocomplete>
-        </v-col>
-
-        <v-col cols="6" v-if="linhaExcecao !== null">
-          <!-- DIALOG REGRA DISTRIBUICAO -->
-          <v-dialog v-model="dialog">
-            <template v-slot:activator="{ on, attrs }">
+          <v-row>
+            <v-col cols="12">
               <v-btn
+                elevation="2"
+                block
+                large
                 color="primary"
-                v-bind="attrs"
-                v-on="on"
-              >Adicionar Exceção</v-btn>
-            </template>
+                @click="adicionarConjuntoPernas"
+              >Adicionar Conjunto de Pernas</v-btn>
+            </v-col>
+          </v-row>
 
-            <v-card>
-              <v-card-title class="headline grey lighten-2">
-                Exceção
-              </v-card-title>
+          <v-row>  
+            <v-col cols="12" v-if="cadastroRegra.pernas.length > 0">
+              <v-select
+                v-model="cadastroRegra.pernaOperadora"
+                :items="pernaIdxArr"
+                item-text="text"
+                item-value="idx"
+                label="Perna da operadora que recebe a receita"
+                thumb-color="orange"
+                thumb-label="always"
+              ></v-select>
+            </v-col>
+          </v-row>
 
-              <v-card-text>
-                <RegraDistribuicao :pernas="cadastroRegra.pernas" @adicionarExcecao="adicionarExcessao"/>
-              </v-card-text>
-            </v-card>
-          </v-dialog>
+          <v-row class="ml-1">
+            <v-col cols="12" v-if="cadastroRegra.pernas.length > 0">
+              <p>Pernas que entram no calculo da receita: </p>
+            </v-col>
+
+            <v-col cols="3" v-for="(perna, idx) in cadastroRegra.pernas" :key="idx">
+              <v-checkbox
+                v-model="cadastroRegra.pernasComReceita"
+                :label="`${idx + 1}ª Perna ${idx === 0 ? '(Origem)' : idx === cadastroRegra.pernas.length-1 ? '(Destino)' : ''}`"
+                :value="idx"
+                class="ma-0 pa-0"
+              ></v-checkbox>
+            </v-col>
+          </v-row>
+
+          <v-row>
+            <v-col :cols="temExcecao ? 3 : 12">
+              <v-checkbox
+                v-model="temExcecao"
+                color="secondary"
+                label="Tem Exceção?"
+              >
+              </v-checkbox>
+            </v-col>
+
+            <v-col cols="9" v-if="temExcecao">
+              <v-autocomplete
+                v-model="linhaExcecao"
+                :items="todasLinhas"
+                item-text="text"
+                item-value="linId"
+                label="Linha para adicionar exceção"
+              ></v-autocomplete>
+            </v-col>
+          </v-row>
+
+          <v-row>
+            <v-col cols="12" v-if="linhaExcecao !== null">
+              <!-- DIALOG REGRA DISTRIBUICAO -->
+              <v-dialog v-model="dialog">
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn
+                    color="orange"
+                    v-bind="attrs"
+                    v-on="on"
+                    block
+                  >Adicionar Exceção</v-btn>
+                </template>
+
+                <v-card>
+                  <v-card-title class="headline grey lighten-2">
+                    Exceção
+                  </v-card-title>
+
+                  <v-card-text>
+                    <RegraDistribuicao :pernas="cadastroRegra.pernas" @adicionarExcecao="adicionarExcessao"/>
+                  </v-card-text>
+                </v-card>
+              </v-dialog>
+            </v-col>
+          </v-row>
+
+          <v-row>
+            <v-col cols="12" v-if="Object.keys(cadastroRegra.excecoes).length > 0">
+              <p>Linhas com exceção: </p> {{ Object.keys(cadastroRegra.excecoes) }}
+            </v-col>
+          </v-row>
+
+          <v-row>
+            <v-col cols="6">
+              <v-btn
+                @click="cadastrarRegra"
+                elevation="2"
+                color="success"
+                large
+                block
+                :disabled="cadastroRegra.pernas.length === 0"
+              >Criar Regra</v-btn>
+            </v-col>
+
+            <v-col cols="6">
+              <v-btn
+                elevation="2"
+                color="error"
+                large
+                block
+                @click="limparCampos"
+              >Limpar Campos</v-btn>
+            </v-col>
+          </v-row>
         </v-col>
-      </v-row>
 
-      <v-row>
-        <v-col cols="12" v-if="Object.keys(cadastroRegra.excecoes).length > 0">
-          <p>Linhas com exceção: </p> {{ Object.keys(cadastroRegra.excecoes) }}
-        </v-col>
-      </v-row>
-
-      <v-row>
-        <v-col cols="12" md="3" v-if="cadastroRegra.pernas.length > 0">
-          <v-btn
-            @click="cadastrarRegra"
-            elevation="2"
-            color="primary"
-            large
-            block
-          >Criar Regra</v-btn>
-        </v-col>
-
-        <v-col cols="12" md="3">
-          <v-btn
-            elevation="2"
-            color="primary"
-            large
-            block
-            @click="limparCampos"
-          >Limpar Campos</v-btn>
+        <v-col cols="5">
+          <v-row v-if="cadastroRegra.pernas.length > 0">
+            <v-col cols="12">
+              <p>Sequência de utilização</p>
+            </v-col>
+          </v-row>
+          <v-row v-if="cadastroRegra.pernas.length > 0">
+            <v-col cols="12">
+              <v-timeline dense>
+                <v-timeline-item v-for="(perna, idx) in cadastroRegra.pernas" :key="idx">
+                  <v-card class="elevation-2">
+                    <v-card-title class="body-1">
+                      {{ idx + 1 }}ª perna
+                      <span class="font-weight-medium">{{ idx === 0 ? '(Origem)' : idx === cadastroRegra.pernas.length-1 ? '(Destino)' : '' }}</span>
+                      - {{ tiposLinhas.filter(t => perna.includes(t.id)).map(t => t.nome) }}
+                      <!-- --- ids: {{ perna }} -->
+                    </v-card-title>
+                  </v-card>
+                </v-timeline-item>
+              </v-timeline>
+            </v-col>
+          </v-row>
         </v-col>
       </v-row>
     </v-container>
