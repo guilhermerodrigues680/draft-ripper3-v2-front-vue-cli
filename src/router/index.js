@@ -4,14 +4,18 @@ import Home from '../views/Home.vue'
 
 Vue.use(VueRouter)
 
-const routes = [
+const brtChildrenRoutes = [
   {
-    path: '/',
+    path: '',
+    redirect: 'home'
+  },
+  {
+    path: 'home',
     name: 'Home',
     component: Home
   },
   {
-    path: '/about',
+    path: 'about',
     name: 'About',
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
@@ -19,35 +23,56 @@ const routes = [
     component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
   },
   {
-    path: '/cadastro-classificacao-linha',
+    path: 'cadastro-classificacao-linha',
     name: 'CadastroClassificaoLinha',
     component: () => import('../views/CadastroClassificaoLinha.vue')
   },
   {
-    path: '/operadoras-financeiras',
+    path: 'operadoras-financeiras',
     name: 'OperadorasFinanceiras',
     component: () => import('../views/OperadorasFinanceiras.vue')
   },
   {
-    path: '/cadastro-classificacao-pernas',
+    path: 'cadastro-classificacao-pernas',
     name: 'CadastrarClassificacaoPernas',
     component: () => import('../views/CadastrarClassificacaoPernas.vue')
   },
   {
-    path: '/viagens-classificadas',
+    path: 'viagens-classificadas',
     name: 'ViagensClassificadas',
     component: () => import('../views/ViagensClassificadas.vue')
   },
   {
-    path: '/processamento-config',
+    path: 'processamento-config',
     name: 'ProcessamentoConfig',
     component: () => import('../views/ProcessamentoConfig.vue')
   },
   {
     path: '*',
-    name: '404',
-    component: () => import('../views/404.vue')
-  }
+    name: 'Pagina404',
+    component: () => import('../views/Pagina404.vue')
+  },
+];
+
+const routes = [
+  {
+    path: '/',
+    redirect: '/seleciona-brt'
+  },
+  {
+    path: '/seleciona-brt',
+    name: 'SelecionaBRT',
+    component: () => import('../views/SelecionaBRT.vue')
+  },
+  {
+    path: '/brt/:idBRT(\\d+)',
+    component: () => import('../views/MainBRT.vue'),
+    children: brtChildrenRoutes
+  },
+  {
+    path: '*',
+    redirect: '/seleciona-brt'
+  },
 ]
 
 const router = new VueRouter({

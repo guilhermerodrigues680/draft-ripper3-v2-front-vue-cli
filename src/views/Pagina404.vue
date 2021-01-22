@@ -30,7 +30,8 @@
 
 <script>
 export default {
-  name: '404',
+  name: 'Pagina404',
+  title: 'Página não encontada',
   mounted () {
     console.log(this, '404 - Página não encontada', this.$router.currentRoute.path)
   }
