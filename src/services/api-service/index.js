@@ -33,6 +33,18 @@ async function postCadastrarTipoLinha(contratoCadastroTipoLinha) {
   }
 }
 
+
+async function deleteTipoLinha(tipoLinhaId) {
+  try {
+    const res = await apiInstance.delete(`/classificacao/tipos-de-linha/${tipoLinhaId}`)
+    return res.data
+  } catch (error) {
+    console.error('Ocorreu um erro')
+    console.error(error)
+    throw error;
+  }
+}
+
 async function getListaClassificaoLinha() {
   try {
     const res = await apiInstance.get("/classificacao/classificacao-de-linhas")
@@ -158,6 +170,7 @@ export default {
   getTodasLinhas,
   getTiposLinha,
   postCadastrarTipoLinha,
+  deleteTipoLinha,
   getListaClassificaoLinha,
   postCadastrarClassificacoLinha,
   postCadastrarRegra,
@@ -167,5 +180,5 @@ export default {
   postPararProcessamento,
   getOperadoraFinanceiraCllId,
   postOperadoraFinanceira,
-  deleteOperadoraFinanceira
+  deleteOperadoraFinanceira,
 }

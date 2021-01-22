@@ -12,7 +12,7 @@
 
       <!-- Criar tipo linha -->
       <v-row>
-        <v-col cols="12">
+        <v-col cols="12" class="my-0 py-0">
           <h2 class="text-h5">Cadastro de tipo de linha</h2>
 
           <v-form v-model="formCadastroTipoLinha">
@@ -45,6 +45,33 @@
             </v-container>
           </v-form>
         </v-col>
+        
+        <v-col cols="12" class="mt-0 pt-0">
+          <v-tooltip
+            top
+            v-for="tipo in tiposLinha"
+            v-bind:key="tipo.id"
+          >
+            <template v-slot:activator="{ on, attrs }">
+              <v-chip
+                class="mx-3 mb-1"
+                color="orange lighten-1"
+                text-color="black"
+                label
+                link
+                v-bind="attrs"
+                v-on="on"
+                close
+                close-icon="mdi-delete"
+                @click:close="clickDeletarTipo(tipo)"
+              >
+                {{ tipo.nome }}
+              </v-chip>
+            </template>
+            <span>{{ tipo.descricao }}</span>
+          </v-tooltip>
+        </v-col>
+
       </v-row>
       <!-- FIM - Criar tipo linha -->
 
@@ -189,7 +216,7 @@ export default {
   created: async function() {
     try {
       const apiRes = await apiService.getTiposLinha();
-      this.tiposLinha = apiRes.tiposDeLinha.map(t => ({ id: t.id, nome: t.nome }))
+      this.tiposLinha = apiRes.tiposDeLinha.map(t => ({ id: t.id, nome: t.nome, descricao: t.descricao }))
       console.log(apiRes)
       console.info('Tipos linhas carregadas')
     } catch (error) {
@@ -232,7 +259,7 @@ export default {
       // Recuperar novos tipos de linha
       try {
         const apiRes = await apiService.getTiposLinha();
-        this.tiposLinha = apiRes.tiposDeLinha.map(t => ({ id: t.id, nome: t.nome }))
+        this.tiposLinha = apiRes.tiposDeLinha.map(t => ({ id: t.id, nome: t.nome, descricao: t.descricao }))
         console.log(apiRes)
         console.info('Tipos linhas carregadas')
       } catch (error) {
@@ -271,6 +298,27 @@ export default {
         console.error('Ocorreu um erro ao cadastrar a classificacao da linha')
       }
 
+    },
+    clickDeletarTipo: async function(tipo) {
+      console.log(tipo)
+      try {
+        await apiService.deleteTipoLinha(tipo.id);
+        this.showToast('Tipo de linha deletado!')
+      } catch(error) {
+        console.error(error)
+        this.showToast('Não foi possivel apagar o tipo de linha.', 'Erro', 'error')
+        return
+      }
+
+      // Recuperar novos tipos de linha
+      try {
+        const apiRes = await apiService.getTiposLinha();
+        this.tiposLinha = apiRes.tiposDeLinha.map(t => ({ id: t.id, nome: t.nome, descricao: t.descricao }))
+        console.log(apiRes)
+        console.info('Tipos linhas carregadas')
+      } catch (error) {
+        console.error('Não foi possivel carregar os Tipos de linhas')
+      }
     },
     showToast: function (message, title = 'Sucesso', icon = 'success') {
       this.$swal({

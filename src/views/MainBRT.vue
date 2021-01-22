@@ -3,6 +3,7 @@
     <v-navigation-drawer
       v-model="drawer"
       app
+      :width="280"
     >
       <AppNavigation />
     </v-navigation-drawer>
