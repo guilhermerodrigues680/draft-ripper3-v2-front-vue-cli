@@ -30,7 +30,7 @@
 </template>
 
 <script>
-import apiService from "../services/api-service/index";
+import * as apiService from "../services/api-service";
 
 export default {
   name: 'ProcessamentoConfig',
@@ -43,7 +43,7 @@ export default {
   methods: {
     iniciarProcessamento: async function() {
       try {
-        await apiService.postIniciarProcessamento()
+        await apiService.processamento.postIniciarProcessamento()
         this.showToast('Processamento iniciado!')
       } catch (error) {
         console.log(error)
@@ -52,7 +52,7 @@ export default {
     },
     pararProcessamento: async function() {
       try {
-        await apiService.postPararProcessamento()
+        await apiService.processamento.postPararProcessamento()
         this.showToast('Processamento parado!', 'Info', 'info')
       } catch (error) {
         console.log(error)

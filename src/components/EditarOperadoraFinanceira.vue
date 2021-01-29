@@ -7,7 +7,7 @@
       transition="dialog-bottom-transition"
     > 
       <v-card>
-        <v-toolbar dark color="purple">
+        <v-toolbar dark color="primary lighten-2">
           <v-btn icon dark @click="closeModal">
             <v-icon>mdi-close</v-icon>
           </v-btn>
@@ -87,7 +87,7 @@
 </template>
 
 <script>
-import apiService from "../services/api-service/index";
+import * as apiService from "../services/api-service";
 
 export default {
   name: 'EditarOperadoraFinanceira',
@@ -118,12 +118,15 @@ export default {
   watch: {
     classificacao: async function (/*newVal, oldVal*/) {
       //console.log('Prop changed: ', newVal, ' | was: ', oldVal)
-      console.debug('Classificacao atualizada')
-      console.log(this.classificacao.linha.descricao)
+      console.debug('Prop classificacao atualizada, valor: ', this.classificacao && this.classificacao.linha && this.classificacao.linha.descricao)
+      if (this.classificacao === null) {
+        return
+      }
+
       this.dialog = true
       
       try {
-        const apiRes = await apiService.getOperadoraFinanceiraCllId(this.classificacao.id)
+        const apiRes = await apiService.operadoraFinanceira.getOperadoraFinanceiraCllId(this.$route.params.idBRT, this.classificacao.id)
         console.log(apiRes, JSON.parse(JSON.stringify(apiRes.operadorasFinanceiras)))
         this.ofiOperadorasFinanceiras = apiRes.operadorasFinanceiras
         console.info('ok')
@@ -142,14 +145,14 @@ export default {
       console.log(item);
 
       try {
-        await apiService.deleteOperadoraFinanceira(item.ofiId);
+        await apiService.operadoraFinanceira.deleteOperadoraFinanceira(this.$route.params.idBRT, item.ofiId);
         console.info('Sucesso no delete')
       } catch (error) {
         console.error('Erro no cadastro')
       }
       
       try {
-        const apiRes = await apiService.getOperadoraFinanceiraCllId(this.classificacao.id)
+        const apiRes = await apiService.operadoraFinanceira.operadoraFinanceira.getOperadoraFinanceiraCllId(this.$route.params.idBRT, this.classificacao.id)
         console.log(apiRes, JSON.parse(JSON.stringify(apiRes.operadorasFinanceiras)))
         this.ofiOperadorasFinanceiras = apiRes.operadorasFinanceiras
         console.info('ok')
@@ -166,14 +169,14 @@ export default {
       }
 
       try {
-        await apiService.postOperadoraFinanceira(newObj);
+        await apiService.operadoraFinanceira.postOperadoraFinanceira(this.$route.params.idBRT, newObj);
         console.info('Sucesso no cadastro')
       } catch (error) {
         console.error('Erro no cadastro')
       }
 
       try {
-        const apiRes = await apiService.getOperadoraFinanceiraCllId(this.classificacao.id)
+        const apiRes = await apiService.operadoraFinanceira.getOperadoraFinanceiraCllId(this.$route.params.idBRT, this.classificacao.id)
         console.log(apiRes, JSON.parse(JSON.stringify(apiRes.operadorasFinanceiras)))
         this.ofiOperadorasFinanceiras = apiRes.operadorasFinanceiras
         console.info('ok')

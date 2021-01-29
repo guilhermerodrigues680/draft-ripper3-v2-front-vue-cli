@@ -183,7 +183,7 @@
 <script>
 import RegraDistribuicao from "../components/RegraDistribuicao.vue";
 
-import apiService from "../services/api-service";
+import * as apiService from "../services/api-service";
 
 export default {
   name: 'CadastrarClassificacaoPernas',
@@ -216,7 +216,7 @@ export default {
 
   created: async function () {
     try {
-      const apiRes = await apiService.getTiposLinha();
+      const apiRes = await apiService.tipoLinha.getTiposLinha(this.$route.params.idBRT);
       this.tiposLinhas = apiRes.tiposDeLinha.map(t => ({ id: t.id, nome: t.nome }))
       console.log(apiRes)
       console.info('Tipos linhas carregadas')
@@ -225,7 +225,7 @@ export default {
     }
 
     try {
-      const apiRes = await apiService.getTodasLinhas();
+      const apiRes = await apiService.linha.getTodasLinhas();
       this.todasLinhas = apiRes.linhas.map(lin => ({ linId: lin.linId, text: `${lin.codificacao} - ${lin.descricao}` }))
       console.log(apiRes)
       console.info('linhas carregadas')
@@ -267,7 +267,7 @@ export default {
 
       // Cadastrar classificaco de linha
       try {
-        const apiRes = await apiService.postCadastrarRegra(contratoCadastroRegra);
+        const apiRes = await apiService.regrasDeClassificacao.postCadastrarRegra(this.$route.params.idBRT, contratoCadastroRegra);
         console.log(apiRes)
         this.showToast('Regra cadastrada!')
       } catch (error) {

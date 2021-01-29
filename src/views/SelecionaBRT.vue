@@ -34,24 +34,34 @@
             md="3"
             sm="3"
           >
-          <v-hover close-delay="65" v-slot="{ hover }">
-            <v-card
-              class="mx-auto cursor-pointer"
-              v-ripple="{ class: `primary--text` }"
-              :elevation="hover ? 1 : 0"
-              :color="hover ? 'primary lighten-3' : ''"
-              max-width="300"
-              outlined
-              @click="selecionaBRT(brt)"
-            >
-              <v-list-item three-line>
-                <v-list-item-content>
-                  <v-list-item-title class="headline my-1">{{ brt.nome }}</v-list-item-title>
-                  <v-list-item-subtitle>{{ brt.descricao }}</v-list-item-subtitle>
-                </v-list-item-content>
-              </v-list-item>
-            </v-card>
+            <v-hover close-delay="65" v-slot="{ hover }">
+              <v-card
+                class="mx-auto cursor-pointer"
+                v-ripple="{ class: `primary--text` }"
+                :elevation="hover ? 1 : 0"
+                :color="hover ? 'primary lighten-3' : ''"
+                max-width="300"
+                outlined
+                @click="selecionaBRT(brt)"
+              >
+                <v-list-item three-line>
+                  <v-list-item-content>
+                    <v-list-item-title class="headline my-1">{{ brt.nome }}</v-list-item-title>
+                    <v-list-item-subtitle>{{ brt.descricao }}</v-list-item-subtitle>
+                    <v-list-item-subtitle>Id do orgão gestor: {{ brt.orgId }}</v-list-item-subtitle>
+                  </v-list-item-content>
+                </v-list-item>
+              </v-card>
             </v-hover>
+          </v-col>
+          <!-- Botão criar BRT / Dialog CadastroBRT -->
+          <v-col
+            class="mb-4"
+            cols="12"
+            md="3"
+            sm="3"
+          >
+            <CadastroBRT @sucessoAoCriarBRT="sucessoAoCriarBRT" @erroAoCriarBRT="erroAoCriarBRT"/>
           </v-col>
         </v-row>
       </v-container>
@@ -69,24 +79,57 @@
 </template>
 
 <script>
+import CadastroBRT from '@/components/mainBRT/CadastroBRT.vue'
+
+import * as apiService from "../services/api-service";
+
 export default {
   name: 'SelecionaBRT',
   title: 'Seleção BRT',
 
+  components: {
+    CadastroBRT
+  },
+
   data: () => ({
-    brts: [
-      { id: 1, nome: "BRT A", descricao: "Brt operando A" },
-      { id: 2, nome: "BRT B", descricao: "Brt operando B" },
-      { id: 3, nome: "BRT C", descricao: "Brt operando C" },
-      { id: 4, nome: "BRT D", descricao: "Brt operando D" },
-      { id: 5, nome: "BRT E", descricao: "Brt operando E" },
-    ]
+    brts: []
   }),
 
+  created: async function () {
+    await this.carregarBRTs();
+    this.showToast('BRTs carregados.', 'INFO', 'info')
+  },
+
   methods: {
+    carregarBRTs: async function () {
+      try {
+        const apiRes = await apiService.brtRipper.getTodosBRTRipper()
+        this.brts = apiRes.brtRipperList
+      } catch (error) {
+        this.showToast('Não foi possivel carregar os BRTs.', 'Erro', 'error')
+      }
+    },
     selecionaBRT: function (brt) {
       console.log('Selecionado BRT', brt.id, brt.nome, brt.descricao, brt)
       this.$router.push(`/brt/${brt.id}`)
+    },
+    sucessoAoCriarBRT: function () {
+      this.showToast('BRT criado com sucesso!')
+      this.carregarBRTs();
+    },
+    erroAoCriarBRT: function () {
+      this.showToast('Erro ao criar o BRT.', 'Erro', 'error')
+    },
+    showToast: function (message, title = 'Sucesso', icon = 'success') {
+      this.$swal({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000,
+        icon: icon,
+        title: title,
+        text: message,
+      });
     }
   }
 };

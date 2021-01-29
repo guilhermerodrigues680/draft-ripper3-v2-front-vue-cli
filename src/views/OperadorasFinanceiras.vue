@@ -61,7 +61,7 @@
 <script>
 import EditarOperadoraFinanceira from '@/components/EditarOperadoraFinanceira.vue'
 
-import apiService from "../services/api-service/index";
+import * as apiService from "../services/api-service";
 import _ from 'lodash';
 
 export default {
@@ -86,7 +86,7 @@ export default {
 
   created: async function() {
     try {
-      const apiRes = await apiService.getListaClassificaoLinha();
+      const apiRes = await apiService.classificacaoLinha.getListaClassificaoLinha(this.$route.params.idBRT);
       this.linhasClassificadas = apiRes.classificacaoLinha
       console.log(apiRes)
       console.info('Classificacao linhas carregado')
@@ -103,6 +103,7 @@ export default {
     },
     closeModal: function () {
       console.log('Close modal')
+      this.classificacaoSelecionada = null
     },
     debounceSearch: _.debounce(function (value) {
       this.search = value;

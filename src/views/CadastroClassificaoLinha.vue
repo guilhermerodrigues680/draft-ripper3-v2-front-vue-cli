@@ -46,6 +46,10 @@
           </v-form>
         </v-col>
         
+        <v-col cols="12" class="mt-0 pt-0" v-if="tiposLinha.length === 0">
+          <v-icon color="orange lighten-1">mdi-information-outline</v-icon>
+          <span class="orange--text text--lighten-1">Nenhum tipo de linha cadastrado</span>
+        </v-col>
         <v-col cols="12" class="mt-0 pt-0">
           <v-tooltip
             top
@@ -186,7 +190,7 @@
 </template>
 
 <script>
-import apiService from "../services/api-service/index";
+import * as apiService from "../services/api-service";
 
 export default {
   name: 'CadastroClassificaoLinha',
@@ -215,7 +219,7 @@ export default {
 
   created: async function() {
     try {
-      const apiRes = await apiService.getTiposLinha();
+      const apiRes = await apiService.tipoLinha.getTiposLinha(this.$route.params.idBRT);
       this.tiposLinha = apiRes.tiposDeLinha.map(t => ({ id: t.id, nome: t.nome, descricao: t.descricao }))
       console.log(apiRes)
       console.info('Tipos linhas carregadas')
@@ -225,7 +229,7 @@ export default {
     }
 
     try {
-      const apiRes = await apiService.getTodasLinhas();
+      const apiRes = await apiService.linha.getTodasLinhas();
       this.todasLinhas = apiRes.linhas.map(lin => ({ linId: lin.linId, text: `${lin.codificacao} - ${lin.descricao}` }))
       console.log(apiRes)
       console.info('linhas carregadas')
@@ -247,7 +251,7 @@ export default {
 
       // Cadastrar tipo de linha
       try {
-        const apiRes = await apiService.postCadastrarTipoLinha(contratoTipoLinha);
+        const apiRes = await apiService.tipoLinha.postCadastrarTipoLinha(this.$route.params.idBRT, contratoTipoLinha);
         console.log(apiRes)
         this.showToast('Tipo de linha cadastrado!')
         this.cadastroTipoLinha.nome = null
@@ -258,7 +262,7 @@ export default {
 
       // Recuperar novos tipos de linha
       try {
-        const apiRes = await apiService.getTiposLinha();
+        const apiRes = await apiService.tipoLinha.getTiposLinha(this.$route.params.idBRT);
         this.tiposLinha = apiRes.tiposDeLinha.map(t => ({ id: t.id, nome: t.nome, descricao: t.descricao }))
         console.log(apiRes)
         console.info('Tipos linhas carregadas')
@@ -291,7 +295,7 @@ export default {
 
       // Cadastrar classificaco de linha
       try {
-        const apiRes = await apiService.postCadastrarClassificacoLinha(contratoClassificacaoLinha);
+        const apiRes = await apiService.classificacaoLinha.postCadastrarClassificacoLinha(this.$route.params.idBRT, contratoClassificacaoLinha);
         console.log(apiRes)
         this.showToast('Classificação de linha cadastrada!')
       } catch (error) {
@@ -302,7 +306,7 @@ export default {
     clickDeletarTipo: async function(tipo) {
       console.log(tipo)
       try {
-        await apiService.deleteTipoLinha(tipo.id);
+        await apiService.tipoLinha.deleteTipoLinha(this.$route.params.idBRT, tipo.id);
         this.showToast('Tipo de linha deletado!')
       } catch(error) {
         console.error(error)
@@ -312,7 +316,7 @@ export default {
 
       // Recuperar novos tipos de linha
       try {
-        const apiRes = await apiService.getTiposLinha();
+        const apiRes = await apiService.tipoLinha.getTiposLinha(this.$route.params.idBRT);
         this.tiposLinha = apiRes.tiposDeLinha.map(t => ({ id: t.id, nome: t.nome, descricao: t.descricao }))
         console.log(apiRes)
         console.info('Tipos linhas carregadas')

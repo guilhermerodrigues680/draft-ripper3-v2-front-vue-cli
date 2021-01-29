@@ -55,6 +55,27 @@
 
       <RastreioUsuario :pernas="pernasRastreio"/>
 
+      <v-divider class="my-5"></v-divider>
+
+      <v-row>
+        <v-col cols="12">
+          <h2>Adiantamento de receita por financeira</h2>
+        </v-col>
+        <v-col cols="12">
+          <v-data-table
+            dense
+            :headers="financeirasAdiantamentosHeaders"
+            :items="financeirasAdiantamentos"
+            :items-per-page="-1"
+            :sort-by="'financeira'"
+            :sort-desc="false"
+            item-key="financeira"
+            class="elevation-1"
+          ></v-data-table>
+        </v-col>
+      </v-row>
+
+
     </v-container>
   </v-container>
 </template>
@@ -63,7 +84,7 @@
 import ViagensClassificadasTable from '@/components/ViagensClassificadasTable.vue'
 import RastreioUsuario from '@/components/RastreioUsuario.vue'
 
-import apiService from "../services/api-service/index";
+import * as apiService from "../services/api-service";
 import _ from 'lodash';
 
 export default {
@@ -79,13 +100,18 @@ export default {
     search: '',
     pernasRastreio: [],
     datasProcessadas: [],
-    selecaoDiaProcessado: ''
+    selecaoDiaProcessado: '',
+    financeirasAdiantamentos: [],
+    financeirasAdiantamentosHeaders: [
+      { text: 'Financeira', value: 'financeira', align: 'center' },
+      { text: 'Adiantamento Total (R$)', value: 'adiantamentoTotal', align: 'center' },
+    ]
   }),
 
   mounted: async function () {
 
     try {
-      const apiRes = await apiService.getDiasProcessados()
+      const apiRes = await apiService.processamento.getDiasProcessados()
       this.datasProcessadas = apiRes.sort()
       this.showToast('Datas processadas carregadas!', 'Info', 'info')
       console.info('Arquivos processados')
@@ -114,18 +140,21 @@ export default {
     },
     buscarDataProcessamento: async function () {
       try {
-        const apiRes = await apiService.getDiaProcessado(new Date(this.selecaoDiaProcessado))
-        this.viagensClassificadas = apiRes.viagensClassificadasEReceitas
-        this.showToast('Viagens classificadas carregadas!')
+        const apiRes = await apiService.processamento.getDiaProcessado(new Date(this.selecaoDiaProcessado))
+        const brrId = +this.$route.params.idBRT
+        const resultadoProcessamentoDiaBRT = apiRes.resultadoProcessamentoDia.resultadoProcessamentoDiaBRTList.find(processDia => processDia.brrId === brrId)
+        this.viagensClassificadas = resultadoProcessamentoDiaBRT.viagensClassificadasEReceitas
+        this.financeirasAdiantamentos = resultadoProcessamentoDiaBRT.financeirasAdiantamentos
+        this.showToast(`Viagens classificadas do BRT ${this.$route.params.idBRT} carregadas!`)
         console.info('Viagens carregadas')
       } catch (error) {
-        this.showToast('Ocorreu um erro.', 'Erro', 'error')
-        console.error('Não foi possivel carregar as viagens classificadas')
+        this.showToast('Ocorreu um erro. BRT ' + this.$route.params.idBRT, 'Erro', 'error')
+        console.error('Não foi possivel carregar as viagens classificadas do BRT ' + this.$route.params.idBRT)
       }
     },
     atualizarDatasProcessadas: async function () {
       try {
-        const apiRes = await apiService.getDiasProcessados()
+        const apiRes = await apiService.processamento.getDiasProcessados()
         this.datasProcessadas = apiRes.sort()
         console.info('Arquivos processados')
         this.showToast('Datas processadas carregadas!', 'Info', 'info')
