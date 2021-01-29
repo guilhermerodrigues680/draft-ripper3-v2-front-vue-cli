@@ -1,0 +1,243 @@
+openapi: 3.0.0
+info:
+  title: Ripper Ótimo
+  version: 0.0.1
+  description: |
+    Documentação da API Rest do **Ripper 3 v2** no padrão OpenAPI 3.0.
+
+  contact:
+    name: Consórcio Ótimo de Bilhetagem Eletrônica
+    url: https://www.otimoonline.com.br
+
+servers:
+  - url: 'http://localhost:8080/api/v2'
+    description: Computador Local
+
+paths:
+  /brt/{brt_id}/classificacao/tipos-de-linha:
+    get:
+      tags:
+        - "Classificação > Tipos de linha"
+      summary: Retorna os tipos de linhas cadastrados em um BRT
+      description: |
+        ## Retorna os tipos de linhas cadastrados em um BRT
+      parameters:
+        - name: brt_id
+          in: path
+          required: true
+          description: ID do BRT
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              example: |-
+                {
+                  "tiposDeLinha": [
+                    {
+                      "id": 1,
+                      "brrId": 1,
+                      "nome": "Alimentadora",
+                      "descricao": "alimentadora",
+                      "createdAt": "2021-01-12T08:16:48.051837",
+                      "updateAt": "2021-01-26T10:56:37.528914"
+                    },
+                    {
+                      "id": 4,
+                      "brrId": 1,
+                      "nome": "Estação",
+                      "descricao": "Estação",
+                      "createdAt": "2021-01-12T08:18:14.741419",
+                      "updateAt": "2021-01-26T10:56:37.528914"
+                    }
+                  ]
+                }
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+
+
+  /:
+    get:
+      tags:
+        - default
+      summary: Retorna a versao da api
+      description: |
+        ## Retorna a versao da api
+      responses:
+        '200':
+          description: Um texto
+          content:
+            text/html;charset=UTF-8:
+              example: |-
+                "API do Ripper 3 versão 2 (ripper-3-v2) do Consórcio Ótimo de Bilhetagem Eletrônica"
+
+  /error:
+    get:
+      tags:
+        - default
+      summary: Retorna um erro no padrão da API
+      description: |
+        ## Retorna um erro no padrão da API
+      responses:
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+
+  /brt:
+    get:
+      tags:
+        - BRT
+      summary: Retorna a lista de BRTs do sistema
+      description: |
+        ## Retorna a lista de BRTs do sistema
+      responses:
+        '200':
+          description: Um JSON contendo a lista de BRTs do sistema
+          content:
+            application/json:
+              example: |-
+                {
+                  "brtRipperList": [
+                    {
+                      "id": 1,
+                      "orgId": 1,
+                      "nome": "BRT BH",
+                      "descricao": "BRT DE BELO HORIZONTE",
+                      "updateAt": "2021-01-26T10:54:56.053111",
+                      "createdAt": "2021-01-26T10:54:56.053111"
+                    },
+                    {
+                      "id": 2,
+                      "orgId": 4,
+                      "nome": "BRT NEVES",
+                      "descricao": "BRT DE RIBEIRÃO DAS NEVES",
+                      "updateAt": "2021-01-26T11:07:05.067031",
+                      "createdAt": "2021-01-26T11:07:05.067031"
+                    }
+                  ]
+                }
+  
+    post:
+      tags:
+        - BRT
+      summary: Cadastra um BRT no sistema
+      description: |
+        ## Cadastra um BRT no sistema
+      requestBody:
+        description: BRT a ser cadastrado
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              example: |-
+                {
+                  "nome": "BRT CONTAGEM",
+                  "descricao": "BRT CONTAGEM 1",
+                  "orgId": 1
+                }
+      responses:
+        '201':
+          description: Um JSON contendo o BRT cadastrado
+          content:
+            application/json:
+              example: |-
+                {
+                  "id": 1,
+                  "orgId": 1,
+                  "nome": "BRT BH",
+                  "descricao": "BRT DE BELO HORIZONTE",
+                  "updateAt": "2021-01-26T10:54:56.053111",
+                  "createdAt": "2021-01-26T10:54:56.053111"
+                }
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+
+  /brt/{brt_id}:
+    get:
+      tags:
+        - BRT
+      summary: Retorna um BRT cadastrado no sistema
+      description: |
+        ## Retorna um BRT cadastrado no sistema
+      parameters:
+        - name: brt_id
+          in: path
+          required: true
+          description: ID do BRT que deseja consumir
+          schema:
+            type: integer
+            format: int64
+
+      responses:
+        '200':
+          description: Um JSON contendo o BRT com id solicitado
+          content:
+            application/json:
+              example: |-
+                {
+                  "id": 1,
+                  "orgId": 1,
+                  "nome": "BRT BH",
+                  "descricao": "BRT DE BELO HORIZONTE",
+                  "updateAt": "2021-01-26T10:54:56.053111",
+                  "createdAt": "2021-01-26T10:54:56.053111"
+                }
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+
+tags:
+  - name: default
+    description: Rotas da API Rest
+  - name: BRT
+    description: Rotas CRUD BRT
+  - name: 'Classificação > Tipos de linha'
+    description: Classificação - Tipos de linha
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: key
+
+  schemas:
+    error:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          type: number
+          format: int32
+        error:
+          type: string
+        message:
+          type: string
+        path:
+          type: string
+      example:
+        timestamp: '2021-01-29T18:01:35.676+00:00'
+        status: 400
+        error: 'Bad Request'
+        message: 'Mensagem detalhando o motivo'
+        path: '/api/v2/brt'
