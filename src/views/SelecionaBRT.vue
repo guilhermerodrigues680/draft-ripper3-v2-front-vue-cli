@@ -8,6 +8,13 @@
       >
 
       <v-toolbar-title>Seleção BRT - Debug</v-toolbar-title>
+
+      <v-spacer></v-spacer>
+
+      <v-btn text @click="irAPIDoc">
+        <v-icon>mdi-file-cloud-outline</v-icon>
+        <span>Documentação API</span>
+      </v-btn>
     </v-app-bar>
 
     <v-main>
@@ -112,6 +119,9 @@ export default {
     selecionaBRT: function (brt) {
       console.log('Selecionado BRT', brt.id, brt.nome, brt.descricao, brt)
       this.$router.push(`/brt/${brt.id}`)
+    },
+    irAPIDoc: function () {
+      this.$router.push('/api-doc')
     },
     sucessoAoCriarBRT: function () {
       this.showToast('BRT criado com sucesso!')

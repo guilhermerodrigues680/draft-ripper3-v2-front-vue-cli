@@ -23,11 +23,6 @@ const brtChildrenRoutes = [
     component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
   },
   {
-    path: 'api-doc',
-    name: 'APIDoc',
-    component: () => import('../views/APIDoc.vue')
-  },
-  {
     path: 'cadastro-classificacao-linha',
     name: 'CadastroClassificaoLinha',
     component: () => import('../views/CadastroClassificaoLinha.vue')
@@ -68,6 +63,11 @@ const routes = [
     path: '/seleciona-brt',
     name: 'SelecionaBRT',
     component: () => import('../views/SelecionaBRT.vue')
+  },
+  {
+    path: '/api-doc',
+    name: 'APIDoc',
+    component: () => import('../views/APIDoc.vue')
   },
   {
     path: '/brt/:idBRT(\\d+)',
