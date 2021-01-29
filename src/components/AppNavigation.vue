@@ -50,6 +50,7 @@ export default {
         { icon: "mdi-tools", title: "Debug - Processamento Conf.", to: `/brt/${this.$route.params.idBRT}/processamento-config` },
         { icon: "mdi-view-dashboard", title: "Foo", to: `/brt/${this.$route.params.idBRT}/foo` },
         { icon: "mdi-plus", title: "Bar", to: `/brt/${this.$route.params.idBRT}/bar` },
+        { icon: "mdi-file-cloud-outline ", title: "Documentação da API", to: `/brt/${this.$route.params.idBRT}/api-doc` },
         { icon: "mdi-forum", title: "About", to: `/brt/${this.$route.params.idBRT}/about` }
       ]
     }

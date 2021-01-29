@@ -23,6 +23,11 @@ const brtChildrenRoutes = [
     component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
   },
   {
+    path: 'api-doc',
+    name: 'APIDoc',
+    component: () => import('../views/APIDoc.vue')
+  },
+  {
     path: 'cadastro-classificacao-linha',
     name: 'CadastroClassificaoLinha',
     component: () => import('../views/CadastroClassificaoLinha.vue')
