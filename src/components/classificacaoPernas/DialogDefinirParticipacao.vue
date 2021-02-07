@@ -154,6 +154,11 @@ export default {
 
       // OK!
       this.$emit('setPercentual', this.mapaOperadoraParticipacaoRateioCustom);
+      Vue.set(this, 'mapaOperadoraParticipacaoRateioCustom', {})
+      Vue.set(this, 'operadoraParticipacaoRateioCustom', {
+        financeira: null,
+        participacao: null
+      })
       this.dialog = false
     }
   }

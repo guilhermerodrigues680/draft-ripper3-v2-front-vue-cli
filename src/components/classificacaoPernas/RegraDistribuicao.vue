@@ -111,12 +111,15 @@
         <!-- DIALOG RECURSIVO - REGRA DISTRIBUICAO -->
         <v-dialog v-model="dialogRecursivoExcecao">
           <template v-slot:activator="{ on, attrs }">
-            <v-btn
-              color="orange"
+            <div
               v-bind="attrs"
               v-on="on"
-              block
-            >Adicionar Exceção</v-btn>
+            >
+              <v-btn
+                color="orange"
+                block
+              >Adicionar Exceção</v-btn>
+            </div>
           </template>
 
           <v-card>
@@ -125,7 +128,7 @@
             </v-card-title>
 
             <v-card-text>
-              <RegraDistribuicao :pernas="pernas" :permitirAdicionarExcecao="false" @update-regra-distribuicao="updateRegraDistribuicaoExcessao"/>
+              <RegraDistribuicao ref="refDialogExcecao" :pernas="pernas" :permitirAdicionarExcecao="false" @update-regra-distribuicao="updateRegraDistribuicaoExcessao"/>
             </v-card-text>
 
             <v-divider></v-divider>
@@ -198,6 +201,7 @@ export default {
       tipoRateio: null,
       idsLinhasComExcecoes: {}
     },
+    regraDistribuicaoExcecao: null
   }),
 
   computed: {
@@ -235,15 +239,37 @@ export default {
       this.cadastroRegra.mapaOperadoraParticipacaoRateioCustom = mapaOperadoraParticipacaoRateioCustom
     },
     salvarExcecao: function () {
-      this.dialogRecursivoExcecao = false
-    },
-    cancelarExcecao: function () {
-      Vue.delete(this.cadastroRegra.idsLinhasComExcecoes, this.linhaExcecao)
+      Vue.set(this.cadastroRegra.idsLinhasComExcecoes, this.linhaExcecao, this.regraDistribuicaoExcecao)
+      this.$refs.refDialogExcecao.resetFields
       this.dialogRecursivoExcecao = false
       this.linhaExcecao = null
+      this.regraDistribuicaoExcecao = null
+    },
+    cancelarExcecao: function () {
+      this.$refs.refDialogExcecao.resetFields
+      this.dialogRecursivoExcecao = false
+      //this.linhaExcecao = null
+      this.regraDistribuicaoExcecao = null
     },
     updateRegraDistribuicaoExcessao(regraDistribuicaoExcecao) {
-      Vue.set(this.cadastroRegra.idsLinhasComExcecoes, this.linhaExcecao, regraDistribuicaoExcecao)
+      this.regraDistribuicaoExcecao = regraDistribuicaoExcecao
+    },
+    resetFields: function () {
+      Vue.set(this, 'cadastroRegra', {
+        idxPernaOperadora: null,
+        idxPernaTerminalOuEstacao: null,
+        mapaOperadoraParticipacaoRateioCustom: null,
+        idxsPernaComReceita: [],
+        contabilizarComoDemandaIntegrada: true,
+        eRateio: false,
+        tipoRateio: null,
+        idsLinhasComExcecoes: {}
+      })
+
+      this.temExcecao = false
+      this.linhaExcecao = null
+      this.resetting = false
+      this.regraDistribuicaoExcecao = null
     },
     montarRegraDistribuicao: function () {
       const modelRegraDistribuicao = {

@@ -49,6 +49,7 @@
           <!-- Regra de classificacao aqui -->
           <RegraDistribuicao
             v-if="cadastroRegra.pernas.length > 0"
+            ref="refRegraDistribuicao"
             :permitirAdicionarExcecao="true"
             :pernas="cadastroRegra.pernas"
             @update-regra-distribuicao="updateRegraDistribuicao"
@@ -108,6 +109,7 @@
 
 <script>
 import RegraDistribuicao from "../components/classificacaoPernas/RegraDistribuicao.vue";
+import Vue from "vue";
 
 import * as apiService from "../services/api-service";
 
@@ -144,11 +146,14 @@ export default {
       this.tiposLinhasPerna.splice(0, this.tiposLinhasPerna.length)
     },
     limparCampos() {
-      // this.cadastroRegra.descricao = ''
-      // this.tiposLinhasPerna.splice(0, this.tiposLinhasPerna.length)
-      // this.cadastroRegra.pernaOperadora = null
-      // this.cadastroRegra.pernasComReceita.splice(0, this.cadastroRegra.pernasComReceita.length)
-      // this.cadastroRegra.pernas.splice(0, this.cadastroRegra.pernas.length);
+      Vue.set(this, 'cadastroRegra', {
+        descricao: '',
+        pernas: [],
+        regraDistribuicao: null
+      })
+
+      this.tiposLinhasPerna.splice(0, this.tiposLinhasPerna.length)
+      this.$refs.refRegraDistribuicao.resetFields
     },
     updateRegraDistribuicao(regraDistribuicao) {
       this.cadastroRegra.regraDistribuicao = regraDistribuicao
