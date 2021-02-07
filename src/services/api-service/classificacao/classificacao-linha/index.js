@@ -22,4 +22,15 @@ async function postCadastrarClassificacoLinha(brtId, contratoCadastroClassificac
   }
 }
 
-export { getListaClassificaoLinha, postCadastrarClassificacoLinha }
+async function postCadastrarClassificacaoVariasLinhas(brtId, contratoCadastroClassificacaoVariasLinhas) {
+  try {
+    const res = await apiInstance.post(`/brt/${brtId}/classificacao/classificacao-de-linhas/varias`, contratoCadastroClassificacaoVariasLinhas)
+    return res.data
+  } catch (error) {
+    console.error('Ocorreu um erro')
+    console.error(error)
+    throw error
+  }
+}
+
+export { getListaClassificaoLinha, postCadastrarClassificacoLinha, postCadastrarClassificacaoVariasLinhas }

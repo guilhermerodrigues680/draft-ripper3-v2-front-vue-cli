@@ -97,6 +97,8 @@
                     item-value="linId"
                     clearable
                     :items="todasLinhas"
+                    multiple
+                    chips
                   ></v-autocomplete>
                 </v-col>
 
@@ -109,14 +111,6 @@
                     item-value="id"
                     :menu-props="{ auto: true }"
                   ></v-select>
-                </v-col>
-
-                <v-col cols="12" md="6">
-                  <v-text-field
-                    v-model="cadastroClassificaoLinha.nomeClassificacao"
-                    label="Nome da classificação"
-                    required
-                  ></v-text-field>
                 </v-col>
 
                 <v-col cols="12" md="6">
@@ -209,7 +203,6 @@ export default {
     cadastroClassificaoLinha: {
       linha: null,
       tipoLinha: null,
-      nomeClassificacao: null,
       dataVigencia: null,
       dataValidade: null,
       eTerminal: false,
@@ -275,27 +268,25 @@ export default {
       value && (this.cadastroClassificaoLinha.dataValidade = null)
     },
     cadastrarClassificacao: async function() {
-      const contratoClassificacaoLinha = {
-        linId: null,
+      const contratoClassificacaoVariasLinhas = {
+        linIds: null,
         tipoLinhaId: null,
-        nome: '',
         dataVigencia: '',
         dataValidade: null,
         alimentadoras: [],
         eterminal: false
       }
 
-      contratoClassificacaoLinha.linId = this.cadastroClassificaoLinha.linha
-      contratoClassificacaoLinha.tipoLinhaId = this.cadastroClassificaoLinha.tipoLinha
-      contratoClassificacaoLinha.nome = this.cadastroClassificaoLinha.nomeClassificacao
-      contratoClassificacaoLinha.dataVigencia = this.cadastroClassificaoLinha.dataVigencia
-      contratoClassificacaoLinha.dataValidade = this.cadastroClassificaoLinha.dataValidade
-      contratoClassificacaoLinha.alimentadoras = this.cadastroClassificaoLinha.alimentadoras
-      contratoClassificacaoLinha.eterminal = this.cadastroClassificaoLinha.eTerminal
+      contratoClassificacaoVariasLinhas.linIds = this.cadastroClassificaoLinha.linha
+      contratoClassificacaoVariasLinhas.tipoLinhaId = this.cadastroClassificaoLinha.tipoLinha
+      contratoClassificacaoVariasLinhas.dataVigencia = this.cadastroClassificaoLinha.dataVigencia
+      contratoClassificacaoVariasLinhas.dataValidade = this.cadastroClassificaoLinha.dataValidade
+      contratoClassificacaoVariasLinhas.alimentadoras = this.cadastroClassificaoLinha.alimentadoras
+      contratoClassificacaoVariasLinhas.eterminal = this.cadastroClassificaoLinha.eTerminal
 
       // Cadastrar classificaco de linha
       try {
-        const apiRes = await apiService.classificacaoLinha.postCadastrarClassificacoLinha(this.$route.params.idBRT, contratoClassificacaoLinha);
+        const apiRes = await apiService.classificacaoLinha.postCadastrarClassificacaoVariasLinhas(this.$route.params.idBRT, contratoClassificacaoVariasLinhas);
         console.log(apiRes)
         this.showToast('Classificação de linha cadastrada!')
       } catch (error) {
