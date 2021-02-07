@@ -46,20 +46,6 @@
             </v-col>
           </v-row>
 
-          <v-row>  
-            <v-col cols="12" v-if="cadastroRegra.pernas.length > 0">
-              <v-select
-                v-model="cadastroRegra.pernaOperadora"
-                :items="pernaIdxArr"
-                item-text="text"
-                item-value="idx"
-                label="Perna da operadora que recebe a receita"
-                thumb-color="orange"
-                thumb-label="always"
-              ></v-select>
-            </v-col>
-          </v-row>
-
           <v-row class="ml-1">
             <v-col cols="12" v-if="cadastroRegra.pernas.length > 0">
               <p>Pernas que entram no calculo da receita: </p>
@@ -76,7 +62,77 @@
           </v-row>
 
           <v-row>
-            <v-col :cols="temExcecao ? 3 : 12">
+            <v-col cols="3">
+              <v-checkbox
+                v-model="cadastroRegra.eRateio"
+                color="primary"
+                label="É rateio?"
+              >
+              </v-checkbox>
+            </v-col>
+
+            <v-col cols="4">
+              <v-select
+                v-if="cadastroRegra.eRateio"
+                v-model="cadastroRegra.tipoRateio"
+                :items="tiposDeRateio"
+                item-text="descricao"
+                item-value="id"
+                label="Tipo do rateio"
+              ></v-select>
+            </v-col>
+
+            <v-col cols="5">
+              <DialogDefinirParticipacao
+                v-if="cadastroRegra.eRateio && cadastroRegra.tipoRateio === 3"
+                @setPercentual="setPercentual"
+              />
+            </v-col>
+          </v-row>
+
+          <v-row v-if="!cadastroRegra.eRateio">  
+            <v-col cols="12" v-if="cadastroRegra.pernas.length > 0">
+              <v-select
+                v-model="cadastroRegra.pernaOperadora"
+                :items="pernaIdxArr"
+                item-text="text"
+                item-value="idx"
+                label="Perna da operadora que recebe a receita"
+                thumb-color="orange"
+                thumb-label="always"
+              ></v-select>
+            </v-col>
+          </v-row>
+
+          <v-row v-if="cadastroRegra.eRateio">  
+            <v-col cols="12" v-if="cadastroRegra.pernas.length > 0">
+              <v-select
+                v-model="cadastroRegra.pernaTerminalOuEstacao"
+                :items="pernaIdxArr"
+                item-text="text"
+                item-value="idx"
+                label="Perna do terminal ou estação"
+                thumb-color="orange"
+                thumb-label="always"
+              ></v-select>
+            </v-col>
+          </v-row>
+
+          <v-row v-if="!cadastroRegra.eRateio">
+            <v-col cols="10">
+              <v-checkbox
+                v-model="cadastroRegra.contabilizarComoDemandaIntegrada"
+                color="primary"
+                label="Contabilizar como demanda integrada? (Se elegível)"
+              >
+              </v-checkbox>
+            </v-col>
+
+            <v-col cols="2"></v-col>
+          </v-row>
+
+          <v-row>
+            <v-col cols="3">
               <v-checkbox
                 v-model="temExcecao"
                 color="secondary"
@@ -84,6 +140,8 @@
               >
               </v-checkbox>
             </v-col>
+
+            <v-col cols="9" v-if="!temExcecao"></v-col>
 
             <v-col cols="9" v-if="temExcecao">
               <v-autocomplete
@@ -182,6 +240,7 @@
 
 <script>
 import RegraDistribuicao from "../components/RegraDistribuicao.vue";
+import DialogDefinirParticipacao from "../components/classificacaoPernas/DialogDefinirParticipacao.vue";
 
 import * as apiService from "../services/api-service";
 
@@ -189,17 +248,27 @@ export default {
   name: 'CadastrarClassificacaoPernas',
 
   components: {
-    RegraDistribuicao
+    RegraDistribuicao,
+    DialogDefinirParticipacao
   },
 
   data: () => ({
     tiposLinhasPerna: [],
     tiposLinhas: [],
+    tiposDeRateio: [
+      { id: 1, descricao: "Rateio Terminal" },
+      { id: 2, descricao: "Rateio BRT" },
+      { id: 3, descricao: "Rateio Custom" },
+    ],
     cadastroRegra: {
       descricao: '',
       pernas: [],
       pernaOperadora: null,
+      pernaTerminalOuEstacao: null,
       pernasComReceita: [],
+      contabilizarComoDemandaIntegrada: true,
+      eRateio: false,
+      tipoRateio: null,
       excecoes: {}
     },
     todasLinhas: [],
@@ -246,24 +315,55 @@ export default {
       this.cadastroRegra.pernasComReceita.splice(0, this.cadastroRegra.pernasComReceita.length)
       this.cadastroRegra.pernas.splice(0, this.cadastroRegra.pernas.length);
     },
+    setPercentual(mapaOperadoraParticipacaoRateioCustom) {
+      console.log('CadastrarClassificacaoPernas.vue', mapaOperadoraParticipacaoRateioCustom)
+      this.mapaOperadoraParticipacaoRateioCustom = mapaOperadoraParticipacaoRateioCustom
+    },
     cadastrarRegra: async function () {
       const contratoCadastroRegra = {
         descricao: '',
         pernaClassificacaoList: [],
         regraDistribuicao: {
+          tipoRateio: null,
+          idxPernaTerminalOuEstacao: null,
+          mapaOperadoraParticipacaoRateioCustom: null,
           idxPernaOperadora: null,
           idxsPernaComReceita: [],
-          idsLinhasComExcecoes: {},
-          erateio: false
+          contabilizarComoDemandaIntegrada: null,
+          idsLinhasComExcecoes: null,
+          erateio: null
         }
       }
 
+      // Descrição
       contratoCadastroRegra.descricao = this.cadastroRegra.descricao
 
-      contratoCadastroRegra.pernaClassificacaoList = this.cadastroRegra.pernas.map(p => ({ tiposDeLinha: p.map(p1 => ({ id: p1 })) }))
-      contratoCadastroRegra.regraDistribuicao.idxPernaOperadora = this.cadastroRegra.pernaOperadora
+      // Lista de classificação de pernas
+      contratoCadastroRegra.pernaClassificacaoList = this.cadastroRegra.pernas.map(p => ({
+        tiposDeLinha: p.map(p1 => ({
+          id: p1
+        }))
+      }))
+
+      // Regra de Distribuição Obrigatorio
       contratoCadastroRegra.regraDistribuicao.idxsPernaComReceita = this.cadastroRegra.pernasComReceita
-      contratoCadastroRegra.regraDistribuicao.idsLinhasComExcecoes = Object.keys(this.cadastroRegra.excecoes).length !== 0 ? this.cadastroRegra.excecoes : null
+      contratoCadastroRegra.regraDistribuicao.erateio = this.cadastroRegra.eRateio;
+
+      if (!this.cadastroRegra.eRateio) {
+        // Regra de Distribuição Não Rateio
+        contratoCadastroRegra.regraDistribuicao.idxPernaOperadora = this.cadastroRegra.pernaOperadora
+        contratoCadastroRegra.regraDistribuicao.contabilizarComoDemandaIntegrada = this.cadastroRegra.contabilizarComoDemandaIntegrada
+      } else {
+        // Regra de Distribuição Rateio
+        contratoCadastroRegra.regraDistribuicao.tipoRateio = this.cadastroRegra.tipoRateio;
+        contratoCadastroRegra.regraDistribuicao.idxPernaTerminalOuEstacao = this.cadastroRegra.pernaTerminalOuEstacao;
+        contratoCadastroRegra.regraDistribuicao.mapaOperadoraParticipacaoRateioCustom = this.mapaOperadoraParticipacaoRateioCustom;
+      }
+
+      if (Object.keys(this.cadastroRegra.excecoes).length !== 0) {
+        // Regra de Distribuição Exceções
+        contratoCadastroRegra.regraDistribuicao.idsLinhasComExcecoes = this.cadastroRegra.excecoes
+      }
 
       // Cadastrar classificaco de linha
       try {
@@ -271,7 +371,8 @@ export default {
         console.log(apiRes)
         this.showToast('Regra cadastrada!')
       } catch (error) {
-        console.error('Ocorreu um erro ao cadastrar a regra')
+        console.error('Ocorreu um erro ao cadastrar a regra', error.message, error.response.data.message)
+        this.showToast(error.message + '. ' + error.response.data.message, 'Erro', 'error')
       }
 
       // const rawJSON = JSON.stringify(contratoCadastroRegra, '', 2)
