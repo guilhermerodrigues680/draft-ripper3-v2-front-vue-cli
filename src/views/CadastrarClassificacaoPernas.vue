@@ -46,147 +46,15 @@
             </v-col>
           </v-row>
 
-          <v-row class="ml-1">
-            <v-col cols="12" v-if="cadastroRegra.pernas.length > 0">
-              <p>Pernas que entram no calculo da receita: </p>
-            </v-col>
+          <!-- Regra de classificacao aqui -->
+          <RegraDistribuicao
+            v-if="cadastroRegra.pernas.length > 0"
+            :permitirAdicionarExcecao="true"
+            :pernas="cadastroRegra.pernas"
+            @update-regra-distribuicao="updateRegraDistribuicao"
+          />
 
-            <v-col cols="3" v-for="(perna, idx) in cadastroRegra.pernas" :key="idx">
-              <v-checkbox
-                v-model="cadastroRegra.pernasComReceita"
-                :label="`${idx + 1}ª Perna ${idx === 0 ? '(Origem)' : idx === cadastroRegra.pernas.length-1 ? '(Destino)' : ''}`"
-                :value="idx"
-                class="ma-0 pa-0"
-              ></v-checkbox>
-            </v-col>
-          </v-row>
-
-          <v-row>
-            <v-col cols="3">
-              <v-checkbox
-                v-model="cadastroRegra.eRateio"
-                color="primary"
-                label="É rateio?"
-              >
-              </v-checkbox>
-            </v-col>
-
-            <v-col cols="4">
-              <v-select
-                v-if="cadastroRegra.eRateio"
-                v-model="cadastroRegra.tipoRateio"
-                :items="tiposDeRateio"
-                item-text="descricao"
-                item-value="id"
-                label="Tipo do rateio"
-              ></v-select>
-            </v-col>
-
-            <v-col cols="5">
-              <DialogDefinirParticipacao
-                v-if="cadastroRegra.eRateio && cadastroRegra.tipoRateio === 3"
-                @setPercentual="setPercentual"
-              />
-            </v-col>
-          </v-row>
-
-          <v-row v-if="!cadastroRegra.eRateio">  
-            <v-col cols="12" v-if="cadastroRegra.pernas.length > 0">
-              <v-select
-                v-model="cadastroRegra.pernaOperadora"
-                :items="pernaIdxArr"
-                item-text="text"
-                item-value="idx"
-                label="Perna da operadora que recebe a receita"
-                thumb-color="orange"
-                thumb-label="always"
-              ></v-select>
-            </v-col>
-          </v-row>
-
-          <v-row v-if="cadastroRegra.eRateio">  
-            <v-col cols="12" v-if="cadastroRegra.pernas.length > 0">
-              <v-select
-                v-model="cadastroRegra.pernaTerminalOuEstacao"
-                :items="pernaIdxArr"
-                item-text="text"
-                item-value="idx"
-                label="Perna do terminal ou estação"
-                thumb-color="orange"
-                thumb-label="always"
-              ></v-select>
-            </v-col>
-          </v-row>
-
-          <v-row v-if="!cadastroRegra.eRateio">
-            <v-col cols="10">
-              <v-checkbox
-                v-model="cadastroRegra.contabilizarComoDemandaIntegrada"
-                color="primary"
-                label="Contabilizar como demanda integrada? (Se elegível)"
-              >
-              </v-checkbox>
-            </v-col>
-
-            <v-col cols="2"></v-col>
-          </v-row>
-
-          <v-row>
-            <v-col cols="3">
-              <v-checkbox
-                v-model="temExcecao"
-                color="secondary"
-                label="Tem Exceção?"
-              >
-              </v-checkbox>
-            </v-col>
-
-            <v-col cols="9" v-if="!temExcecao"></v-col>
-
-            <v-col cols="9" v-if="temExcecao">
-              <v-autocomplete
-                v-model="linhaExcecao"
-                :items="todasLinhas"
-                item-text="text"
-                item-value="linId"
-                label="Linha para adicionar exceção"
-              ></v-autocomplete>
-            </v-col>
-          </v-row>
-
-          <v-row>
-            <v-col cols="12" v-if="linhaExcecao !== null">
-              <!-- DIALOG REGRA DISTRIBUICAO -->
-              <v-dialog v-model="dialog">
-                <template v-slot:activator="{ on, attrs }">
-                  <v-btn
-                    color="orange"
-                    v-bind="attrs"
-                    v-on="on"
-                    block
-                  >Adicionar Exceção</v-btn>
-                </template>
-
-                <v-card>
-                  <v-card-title class="headline grey lighten-2">
-                    Exceção
-                  </v-card-title>
-
-                  <v-card-text>
-                    <RegraDistribuicao :pernas="cadastroRegra.pernas" @adicionarExcecao="adicionarExcessao"/>
-                  </v-card-text>
-                </v-card>
-              </v-dialog>
-            </v-col>
-          </v-row>
-
-          <v-row>
-            <v-col cols="12" v-if="Object.keys(cadastroRegra.excecoes).length > 0">
-              <p>Linhas com exceção: </p> {{ Object.keys(cadastroRegra.excecoes) }}
-            </v-col>
-          </v-row>
-
-          <v-row>
+          <v-row v-if="cadastroRegra.pernas.length > 0">
             <v-col cols="6">
               <v-btn
                 @click="cadastrarRegra"
@@ -239,8 +107,7 @@
 </template>
 
 <script>
-import RegraDistribuicao from "../components/RegraDistribuicao.vue";
-import DialogDefinirParticipacao from "../components/classificacaoPernas/DialogDefinirParticipacao.vue";
+import RegraDistribuicao from "../components/classificacaoPernas/RegraDistribuicao.vue";
 
 import * as apiService from "../services/api-service";
 
@@ -248,58 +115,26 @@ export default {
   name: 'CadastrarClassificacaoPernas',
 
   components: {
-    RegraDistribuicao,
-    DialogDefinirParticipacao
+    RegraDistribuicao
   },
 
   data: () => ({
     tiposLinhasPerna: [],
     tiposLinhas: [],
-    tiposDeRateio: [
-      { id: 1, descricao: "Rateio Terminal" },
-      { id: 2, descricao: "Rateio BRT" },
-      { id: 3, descricao: "Rateio Custom" },
-    ],
     cadastroRegra: {
       descricao: '',
       pernas: [],
-      pernaOperadora: null,
-      pernaTerminalOuEstacao: null,
-      pernasComReceita: [],
-      contabilizarComoDemandaIntegrada: true,
-      eRateio: false,
-      tipoRateio: null,
-      excecoes: {}
-    },
-    todasLinhas: [],
-    temExcecao: false,
-    linhaExcecao: null,
-    dialog: false
-  }),
-
-  computed: {
-    pernaIdxArr: function() {
-      return this.cadastroRegra.pernas.map((p, idx, arr) => ({ idx: idx, text: `${idx + 1}ª Perna ${idx === 0 ? '(Origem)' : idx === arr.length - 1 ? '(Destino)' : ''}` }))
+      regraDistribuicao: null
     }
-  },
+  }),
 
   created: async function () {
     try {
       const apiRes = await apiService.tipoLinha.getTiposLinha(this.$route.params.idBRT);
       this.tiposLinhas = apiRes.tiposDeLinha.map(t => ({ id: t.id, nome: t.nome }))
-      console.log(apiRes)
-      console.info('Tipos linhas carregadas')
+      this.showToast('Tipos linhas carregadas')
     } catch (error) {
-      console.error('Não foi possivel carregar os Tipos de linhas')
-    }
-
-    try {
-      const apiRes = await apiService.linha.getTodasLinhas();
-      this.todasLinhas = apiRes.linhas.map(lin => ({ linId: lin.linId, text: `${lin.codificacao} - ${lin.descricao}` }))
-      console.log(apiRes)
-      console.info('linhas carregadas')
-    } catch (error) {
-      console.error('Não foi possivel carregar os linhas')
+      this.showToast('Não foi possivel carregar os Tipos de linhas', 'Erro', 'error')
     }
   },
 
@@ -309,88 +144,44 @@ export default {
       this.tiposLinhasPerna.splice(0, this.tiposLinhasPerna.length)
     },
     limparCampos() {
-      this.cadastroRegra.descricao = ''
-      this.tiposLinhasPerna.splice(0, this.tiposLinhasPerna.length)
-      this.cadastroRegra.pernaOperadora = null
-      this.cadastroRegra.pernasComReceita.splice(0, this.cadastroRegra.pernasComReceita.length)
-      this.cadastroRegra.pernas.splice(0, this.cadastroRegra.pernas.length);
+      // this.cadastroRegra.descricao = ''
+      // this.tiposLinhasPerna.splice(0, this.tiposLinhasPerna.length)
+      // this.cadastroRegra.pernaOperadora = null
+      // this.cadastroRegra.pernasComReceita.splice(0, this.cadastroRegra.pernasComReceita.length)
+      // this.cadastroRegra.pernas.splice(0, this.cadastroRegra.pernas.length);
     },
-    setPercentual(mapaOperadoraParticipacaoRateioCustom) {
-      console.log('CadastrarClassificacaoPernas.vue', mapaOperadoraParticipacaoRateioCustom)
-      this.mapaOperadoraParticipacaoRateioCustom = mapaOperadoraParticipacaoRateioCustom
+    updateRegraDistribuicao(regraDistribuicao) {
+      this.cadastroRegra.regraDistribuicao = regraDistribuicao
     },
     cadastrarRegra: async function () {
-      const contratoCadastroRegra = {
-        descricao: '',
-        pernaClassificacaoList: [],
-        regraDistribuicao: {
-          tipoRateio: null,
-          idxPernaTerminalOuEstacao: null,
-          mapaOperadoraParticipacaoRateioCustom: null,
-          idxPernaOperadora: null,
-          idxsPernaComReceita: [],
-          contabilizarComoDemandaIntegrada: null,
-          idsLinhasComExcecoes: null,
-          erateio: null
-        }
-      }
-
-      // Descrição
-      contratoCadastroRegra.descricao = this.cadastroRegra.descricao
-
       // Lista de classificação de pernas
-      contratoCadastroRegra.pernaClassificacaoList = this.cadastroRegra.pernas.map(p => ({
+      const pernaClassificacaoList = this.cadastroRegra.pernas.map(p => ({
         tiposDeLinha: p.map(p1 => ({
           id: p1
         }))
       }))
 
-      // Regra de Distribuição Obrigatorio
-      contratoCadastroRegra.regraDistribuicao.idxsPernaComReceita = this.cadastroRegra.pernasComReceita
-      contratoCadastroRegra.regraDistribuicao.erateio = this.cadastroRegra.eRateio;
-
-      if (!this.cadastroRegra.eRateio) {
-        // Regra de Distribuição Não Rateio
-        contratoCadastroRegra.regraDistribuicao.idxPernaOperadora = this.cadastroRegra.pernaOperadora
-        contratoCadastroRegra.regraDistribuicao.contabilizarComoDemandaIntegrada = this.cadastroRegra.contabilizarComoDemandaIntegrada
-      } else {
-        // Regra de Distribuição Rateio
-        contratoCadastroRegra.regraDistribuicao.tipoRateio = this.cadastroRegra.tipoRateio;
-        contratoCadastroRegra.regraDistribuicao.idxPernaTerminalOuEstacao = this.cadastroRegra.pernaTerminalOuEstacao;
-        contratoCadastroRegra.regraDistribuicao.mapaOperadoraParticipacaoRateioCustom = this.mapaOperadoraParticipacaoRateioCustom;
-      }
-
-      if (Object.keys(this.cadastroRegra.excecoes).length !== 0) {
-        // Regra de Distribuição Exceções
-        contratoCadastroRegra.regraDistribuicao.idsLinhasComExcecoes = this.cadastroRegra.excecoes
+      const contratoCadastroRegra = {
+        descricao: this.cadastroRegra.descricao,
+        pernaClassificacaoList: pernaClassificacaoList,
+        regraDistribuicao: this.cadastroRegra.regraDistribuicao
       }
 
       // Cadastrar classificaco de linha
       try {
-        const apiRes = await apiService.regrasDeClassificacao.postCadastrarRegra(this.$route.params.idBRT, contratoCadastroRegra);
-        console.log(apiRes)
+        //const apiRes = 
+        await apiService.regrasDeClassificacao.postCadastrarRegra(this.$route.params.idBRT, contratoCadastroRegra);
         this.showToast('Regra cadastrada!')
       } catch (error) {
-        console.error('Ocorreu um erro ao cadastrar a regra', error.message, error.response.data.message)
-        this.showToast(error.message + '. ' + error.response.data.message, 'Erro', 'error')
+        this.showToast(error.message + '. ' + error.response.data.message, 'Erro', 'error', true)
       }
-
-      // const rawJSON = JSON.stringify(contratoCadastroRegra, '', 2)
-      // const blob = new Blob([rawJSON], {type : 'application/json'})
-      // const url  = URL.createObjectURL(blob)
-      // window.open(url)
     },
-    adicionarExcessao(regraDistribuicao) {
-      this.cadastroRegra.excecoes[this.linhaExcecao] = regraDistribuicao
-      this.dialog = false
-      this.linhaExcecao = null
-    },
-    showToast: function (message, title = 'Sucesso', icon = 'success') {
+    showToast: function (message, title = 'Sucesso', icon = 'success', showConfirmButton = false) {
       this.$swal({
         toast: true,
         position: 'top-end',
-        showConfirmButton: false,
-        timer: 3000,
+        showConfirmButton: showConfirmButton,
+        timer: showConfirmButton ? null: 3000,
         icon: icon,
         title: title,
         text: message,
