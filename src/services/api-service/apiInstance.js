@@ -1,7 +1,8 @@
 import axios from 'axios'
 
 const apiInstance = axios.create({
-  baseURL: 'http://localhost:8080/api/v2',
+  baseURL: '/api/v2',
+  //baseURL: 'http://localhost:8080/api/v2',
   // baseURL: 'http://192.168.144.14:8080/api/v2',
   // timeout: 1000,
   // headers: {'X-Custom-Header': 'foobar'}
