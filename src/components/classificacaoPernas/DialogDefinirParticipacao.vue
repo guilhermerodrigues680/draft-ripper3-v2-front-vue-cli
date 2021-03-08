@@ -14,6 +14,7 @@
            elevation="2"
            block
            color="orange"
+           class="white--text"
           >Definir participação</v-btn>
         </div>
       </template>
@@ -60,12 +61,12 @@
                     hide-default-footer
                     class="elevation-1"
                   >
-                    <template v-slot:[`item.operadora`]="{ item }">
-                      {{ item.operadora !== null ? item.operadora : 'Qualquer Operadora'  }}
-                    </template>
-                    
                     <template v-slot:[`item.financeira`]="{ item }">
-                      {{ item.financeira !== null ? item.financeira : 'Própria Operadora' }}
+                      {{ item.financeira }}
+                    </template>
+
+                    <template v-slot:[`item.participacao`]="{ item }">
+                      {{ item.participacao * 100 }}
                     </template>
                     
                     <template v-slot:[`item.controls`]="props">
@@ -141,18 +142,22 @@ export default {
       Vue.delete(this.mapaOperadoraParticipacaoRateioCustom, item.financeira)
     },
     addButtonClick: function () {
-      Vue.set(this.mapaOperadoraParticipacaoRateioCustom, +this.operadoraParticipacaoRateioCustom.financeira, +this.operadoraParticipacaoRateioCustom.participacao)
+      const participacao = Math.round((+this.operadoraParticipacaoRateioCustom.participacao + Number.EPSILON) * 1e6) / 1e8
+      Vue.set(this.mapaOperadoraParticipacaoRateioCustom, +this.operadoraParticipacaoRateioCustom.financeira, participacao)
+      this.operadoraParticipacaoRateioCustom.financeira = null
+      this.operadoraParticipacaoRateioCustom.participacao = null
     },
     salveBtnClick: function () {
       const total = Object.values(this.mapaOperadoraParticipacaoRateioCustom).reduce((pre, cur) => pre + cur, 0)
       
       if (total !== 1) {
-        const totalPercent = Math.round((((total * 100) + Number.EPSILON) * 1e8) / 1e8)
+        const totalPercent = Math.round(((total * 100) + Number.EPSILON) * 1e6) / 1e6
         this.errorMessage = `*ATENÇÃO: O somatório de participação totalizou ${totalPercent}%, ele deve ser 100%`
         return
       }
 
       // OK!
+      console.debug(this.mapaOperadoraParticipacaoRateioCustom)
       this.$emit('setPercentual', this.mapaOperadoraParticipacaoRateioCustom);
       Vue.set(this, 'mapaOperadoraParticipacaoRateioCustom', {})
       Vue.set(this, 'operadoraParticipacaoRateioCustom', {

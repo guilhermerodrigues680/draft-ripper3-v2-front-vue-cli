@@ -1,5 +1,15 @@
 <template>
   <div>
+    <!-- Somente exceções possuem nome -->
+    <v-row v-if="permitirAdicionarExcecao !== true">
+      <v-col cols="12">
+        <v-text-field
+          v-model="cadastroRegra.nome"
+          label="Nome da Regra"
+        ></v-text-field>
+      </v-col>
+    </v-row>
+    
     <v-row>
       <v-col cols="12">
         <p>Pernas que entram no calculo da receita: </p>
@@ -25,7 +35,7 @@
         </v-checkbox>
       </v-col>
 
-      <v-col cols="4">
+      <v-col cols="9">
         <v-select
           v-if="cadastroRegra.eRateio"
           v-model="cadastroRegra.tipoRateio"
@@ -34,14 +44,7 @@
           item-value="id"
           label="Tipo do rateio"
         ></v-select>
-      </v-col>
-
-      <v-col cols="5">
-        <DialogDefinirParticipacao
-          v-if="cadastroRegra.eRateio && cadastroRegra.tipoRateio === 3"
-          @setPercentual="setPercentual"
-        />
-      </v-col>
+      </v-col>      
     </v-row>
 
     <v-row v-if="!cadastroRegra.eRateio">  
@@ -58,16 +61,41 @@
       </v-col>
     </v-row>
 
-    <v-row v-if="cadastroRegra.eRateio">  
+    <!-- Rateio Terminal -->
+    <v-row v-if="cadastroRegra.eRateio && cadastroRegra.tipoRateio === 1">  
       <v-col cols="12">
         <v-select
           v-model="cadastroRegra.idxPernaTerminalOuEstacao"
           :items="pernaIdxArr"
           item-text="text"
           item-value="idx"
-          label="Perna do terminal ou estação"
-          thumb-color="orange"
-          thumb-label="always"
+          label="Perna que contém o terminal"
+        ></v-select>
+      </v-col>
+    </v-row>
+
+    <!-- Rateio Custom -->
+    <v-row>
+      <v-col cols="12" v-if="cadastroRegra.eRateio && cadastroRegra.tipoRateio === 3">
+        <DialogDefinirParticipacao
+          v-if="cadastroRegra.eRateio && cadastroRegra.tipoRateio === 3"
+          @setPercentual="setPercentual"
+        />
+      </v-col>
+    </v-row>
+    
+    <!-- Rateio N Terminais -->
+    <v-row>
+      <v-col cols="12" v-if="cadastroRegra.eRateio && cadastroRegra.tipoRateio === 4">
+        <v-select
+          v-if="cadastroRegra.eRateio && cadastroRegra.tipoRateio === 4"
+          v-model="cadastroRegra.listaIdsTerminaisRateioNTerminais"
+          :items="terminaisDisponiveis"
+          :menu-props="{ top: true }"
+          label="Terminais"
+          multiple
+          dense
+          chips
         ></v-select>
       </v-col>
     </v-row>
@@ -156,8 +184,11 @@
     </v-row>
 
     <v-row>
-      <v-col cols="12" v-if="Object.keys(cadastroRegra.idsLinhasComExcecoes).length > 0">
-        <p>Linhas com exceção: </p> {{ Object.keys(cadastroRegra.idsLinhasComExcecoes) }}
+      <v-col cols="12" v-if="linhasComExcecoes.length > 0">
+        <p>Linhas com exceção</p>
+        <ul>
+          <li v-for="linha in linhasComExcecoes" :key="linha.linId">({{linha.linId}}) {{linha.text}}</li>
+        </ul>
       </v-col>
     </v-row>
   </div>
@@ -183,15 +214,13 @@ export default {
 
   data: () => ({
     todasLinhas: [],
-    tiposDeRateio: [
-      { id: 1, descricao: "Rateio Terminal" },
-      { id: 2, descricao: "Rateio BRT" },
-      { id: 3, descricao: "Rateio Custom" },
-    ],
+    tiposDeRateio: [],
+    terminaisDisponiveis: [],
     temExcecao: false,
     linhaExcecao: null,
     dialogRecursivoExcecao: false,
     cadastroRegra: {
+      nome: null,
       idxPernaOperadora: null,
       idxPernaTerminalOuEstacao: null,
       mapaOperadoraParticipacaoRateioCustom: null,
@@ -199,6 +228,7 @@ export default {
       contabilizarComoDemandaIntegrada: true,
       eRateio: false,
       tipoRateio: null,
+      listaIdsTerminaisRateioNTerminais: null,
       idsLinhasComExcecoes: {}
     },
     regraDistribuicaoExcecao: null
@@ -207,6 +237,10 @@ export default {
   computed: {
     pernaIdxArr: function() {
       return this.pernas.map((p, idx, arr) => ({ idx: idx, text: `${idx + 1}ª Perna ${idx === 0 ? '(Origem)' : idx === arr.length - 1 ? '(Destino)' : ''}` }))
+    },
+    linhasComExcecoes: function () {
+      const idsLinhasExc = Object.keys(this.cadastroRegra.idsLinhasComExcecoes).map(k => +k)
+      return this.todasLinhas.filter(lin => idsLinhasExc.includes(+lin.linId))
     }
   },
 
@@ -221,6 +255,24 @@ export default {
   },
 
   created: async function () {
+    this.tiposDeRateio = [
+      { id: 1, descricao: "Rateio Terminal" },
+      { id: 2, descricao: "Rateio BRT" },
+      { id: 3, descricao: "Rateio Custom" },
+      { id: 4, descricao: "Rateio N Terminais" }
+    ]
+
+    try {
+      const apiRes = await apiService.classificacaoLinha.getListaClassificaoLinha(this.$route.params.idBRT)
+      const terminaisDisponiveis = apiRes.classificacaoLinha
+        .filter(cl => cl.eterminal)
+        .map(cl => ({ value: cl.linId,  text: `${cl.linha.codificacao} - ${cl.linha.descricao}`}));
+
+      this.terminaisDisponiveis = terminaisDisponiveis;
+    } catch (error) {
+      console.error(error)
+    }
+
     if (!this.permitirAdicionarExcecao) {
       return
     }
@@ -273,6 +325,7 @@ export default {
     },
     montarRegraDistribuicao: function () {
       const modelRegraDistribuicao = {
+        nome: null,
         tipoRateio: null,
         idxPernaTerminalOuEstacao: null,
         mapaOperadoraParticipacaoRateioCustom: null,
@@ -280,10 +333,12 @@ export default {
         idxsPernaComReceita: null,
         contabilizarComoDemandaIntegrada: null,
         idsLinhasComExcecoes: null,
+        listaIdsTerminaisRateioNTerminais: null,
         erateio: null
       };
 
       // Regra de Distribuição Obrigatorio
+      modelRegraDistribuicao.nome = this.cadastroRegra.nome
       modelRegraDistribuicao.idxsPernaComReceita = this.cadastroRegra.idxsPernaComReceita
       modelRegraDistribuicao.erateio = this.cadastroRegra.eRateio
 
@@ -294,8 +349,16 @@ export default {
       } else {
         // Regra de Distribuição Rateio
         modelRegraDistribuicao.tipoRateio = this.cadastroRegra.tipoRateio;
-        modelRegraDistribuicao.idxPernaTerminalOuEstacao = this.cadastroRegra.idxPernaTerminalOuEstacao
-        modelRegraDistribuicao.mapaOperadoraParticipacaoRateioCustom = this.cadastroRegra.mapaOperadoraParticipacaoRateioCustom
+        
+        if (this.cadastroRegra.tipoRateio === 1) {
+          modelRegraDistribuicao.idxPernaTerminalOuEstacao = this.cadastroRegra.idxPernaTerminalOuEstacao
+        //} else if (this.cadastroRegra.tipoRateio === 2) {
+          // nada
+        } else if (this.cadastroRegra.tipoRateio === 3) {
+          modelRegraDistribuicao.mapaOperadoraParticipacaoRateioCustom = this.cadastroRegra.mapaOperadoraParticipacaoRateioCustom
+        } else if (this.cadastroRegra.tipoRateio === 4) {
+          modelRegraDistribuicao.listaIdsTerminaisRateioNTerminais = this.cadastroRegra.listaIdsTerminaisRateioNTerminais
+        }
       }
 
       if (Object.keys(this.cadastroRegra.idsLinhasComExcecoes).length > 0) {

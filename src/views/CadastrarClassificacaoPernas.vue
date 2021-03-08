@@ -30,6 +30,7 @@
                 chips
                 label="Tipos de linha para a perna"
                 multiple
+                dense
               ></v-autocomplete>
             </v-col>
           </v-row>
