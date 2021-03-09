@@ -15,6 +15,10 @@
         <v-icon>mdi-file-cloud-outline</v-icon>
         <span>Documentação API</span>
       </v-btn>
+      <v-btn text href="/bi/index.html">
+        <v-icon>mdi-open-in-new</v-icon>
+        <span>BI Ripper</span>
+      </v-btn>
     </v-app-bar>
 
     <v-main>

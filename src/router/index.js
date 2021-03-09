@@ -38,6 +38,11 @@ const brtChildrenRoutes = [
     component: () => import('../views/CadastrarClassificacaoPernas.vue')
   },
   {
+    path: 'visualizacao-viagens-classificadas',
+    name: 'VisualizacaoViagensClassificadas',
+    component: () => import('../views/VisualizacaoViagensClassificadas.vue')
+  },
+  {
     path: 'viagens-classificadas',
     name: 'ViagensClassificadas',
     component: () => import('../views/ViagensClassificadas.vue')
