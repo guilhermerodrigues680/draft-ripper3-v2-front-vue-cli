@@ -48,6 +48,11 @@ const brtChildrenRoutes = [
     component: () => import('../views/ViagensClassificadas.vue')
   },
   {
+    path: 'edicao-linhas-classificadas',
+    name: 'EdicaoLinhasClassificadas',
+    component: () => import('../views/EdicaoLinhasClassificadas.vue')
+  },
+  {
     path: 'processamento-config',
     name: 'ProcessamentoConfig',
     component: () => import('../views/ProcessamentoConfig.vue')

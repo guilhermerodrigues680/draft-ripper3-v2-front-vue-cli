@@ -11,6 +11,17 @@ async function getListaClassificaoLinha(brtId) {
   }
 }
 
+async function deleteListaClassificaoLinha(brtId, id) {
+  try {
+    const res = await apiInstance.delete(`/brt/${brtId}/classificacao/classificacao-de-linhas/${id}`)
+    return res.data
+  } catch(error) {
+    console.error('Ocorreu um erro')
+    console.error(error)
+    throw error
+  }
+}
+
 async function postCadastrarClassificacoLinha(brtId, contratoCadastroClassificacaoLinha) {
   try {
     const res = await apiInstance.post(`/brt/${brtId}/classificacao/classificacao-de-linhas`, contratoCadastroClassificacaoLinha)
@@ -33,4 +44,4 @@ async function postCadastrarClassificacaoVariasLinhas(brtId, contratoCadastroCla
   }
 }
 
-export { getListaClassificaoLinha, postCadastrarClassificacoLinha, postCadastrarClassificacaoVariasLinhas }
+export { getListaClassificaoLinha, postCadastrarClassificacoLinha, postCadastrarClassificacaoVariasLinhas, deleteListaClassificaoLinha }
